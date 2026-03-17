@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardioPredict AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+
+        body { background-color: #F1F5F9; }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: linear-gradient(90deg, #0F2044, #1a3a6e);
+            padding: 14px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .navbar-brand {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .nav-badge {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            background: linear-gradient(135deg, #0F2044 0%, #1a56db 100%);
+            color: white;
+            padding: 70px 0 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+        }
+        .hero h1 {
+            font-size: 38px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .hero p {
+            font-size: 17px;
+            opacity: 0.85;
+            max-width: 550px;
+            margin: 12px auto 0;
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 35px;
+        }
+        .hero-stat {
+            text-align: center;
+        }
+        .hero-stat .number {
+            font-size: 26px;
+            font-weight: 700;
+        }
+        .hero-stat .label {
+            font-size: 13px;
+            opacity: 0.75;
+            margin-top: 2px;
+        }
+
+        /* ── Cards ── */
+        .main-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            border: none;
+            overflow: hidden;
+        }
+        .section-header {
+            background: linear-gradient(90deg, #0F2044, #1a3a6e);
+            color: white;
+            padding: 14px 24px;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+        }
+        .section-body {
+            padding: 24px;
+        }
+        .section-divider {
+            background: #F8FAFC;
+            border-top: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 10px 24px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin: 8px 0;
+        }
+
+        /* ── Form Fields ── */
+        .form-label {
+            font-weight: 600;
+            font-size: 13.5px;
+            color: #1E293B;
+            margin-bottom: 5px;
+        }
+        .form-control, .form-select {
+            border: 1.5px solid #CBD5E1;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            color: #1E293B;
+            transition: all 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #1a56db;
+            box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
+        }
+        .form-hint {
+            font-size: 12px;
+            color: #94A3B8;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+        .field-group {
+            margin-bottom: 20px;
+        }
+
+        /* ── Submit Button ── */
+        .btn-predict {
+            background: linear-gradient(135deg, #1a56db, #0F2044);
+            color: white;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            width: 100%;
+            letter-spacing: 0.3px;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+        .btn-predict:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26,86,219,0.35);
+            color: white;
+        }
+        .btn-predict:active { transform: translateY(0); }
+
+        /* ── Result Box ── */
+        .result-card {
+            display: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+            margin-top: 28px;
+        }
+        .result-header {
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        .result-low .result-header { background: linear-gradient(135deg, #059669, #10B981); }
+        .result-moderate .result-header { background: linear-gradient(135deg, #D97706, #F59E0B); }
+        .result-high .result-header { background: linear-gradient(135deg, #DC2626, #EF4444); }
+        .result-veryhigh .result-header { background: linear-gradient(135deg, #7F1D1D, #DC2626); }
+
+        .risk-score-text {
+            font-size: 80px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+        .risk-level-text {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 8px;
+            opacity: 0.95;
+        }
+        .result-body {
+            background: white;
+            padding: 24px;
+        }
+        .result-message {
+            font-size: 15px;
+            color: #374151;
+            text-align: center;
+            padding: 16px;
+            background: #F8FAFC;
+            border-radius: 10px;
+            border: 1px solid #E2E8F0;
+        }
+
+        /* ── Disclaimer ── */
+        .disclaimer {
+            background: #FFFBEB;
+            border-left: 4px solid #F59E0B;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #78350F;
+            margin-bottom: 24px;
+        }
+
+        /* ── Footer ── */
+        footer {
+            background: #0F2044;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 24px;
+            font-size: 13px;
+            margin-top: 60px;
+        }
+
+        /* ── Loading ── */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #1a56db;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-dark">
+    <div class="container d-flex justify-content-between align-items-center">
+        <span class="navbar-brand">❤️ CardioPredict AI</span>
+        <span class="nav-badge">BCA Final Year Project</span>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="container">
+        <h1>Cardiovascular Risk Assessment</h1>
+        <p>Enter your health metrics below to receive your personalised cardiovascular disease risk score</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="number">68,517</div>
+                <div class="label">Patients Trained On</div>
+            </div>
+            <div class="hero-stat">
+                <div class="number">80.6%</div>
+                <div class="label">Model AUC Score</div>
+            </div>
+            <div class="hero-stat">
+                <div class="number">3</div>
+                <div class="label">ML Models Compared</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                ⚠️ <strong>Medical Disclaimer:</strong> CardioPredict AI is an educational tool only.
+                It does not provide medical diagnoses. Always consult a qualified healthcare professional
+                before making any health decisions.
+            </div>
+
+            <!-- Form Card -->
+            <div class="main-card">
+                <div class="section-header">
+                    📋 Patient Health Information
+                </div>
+
+                <form id="predictForm">
+
+                    <!-- Personal Information -->
+                    <div class="section-divider">👤 Personal Information</div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-3 field-group">
+                                <label class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age"
+                                       min="20" max="80" placeholder="e.g. 45" required>
+                                <div class="form-hint">Enter your age in years (20–80)</div>
+                            </div>
+                            <div class="col-md-3 field-group">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" id="gender" required>
+                                    <option value="">Select</option>
+                                    <option value="2">Male</option>
+                                    <option value="1">Female</option>
+                                    <option value="1">Other / Prefer not to say</option>
+                                </select>
+                                <div class="form-hint">Select the closest option</div>
+                            </div>
+                            <div class="col-md-3 field-group">
+                                <label class="form-label">Height (cm)</label>
+                                <input type="number" class="form-control" id="height"
+                                       min="130" max="220" placeholder="e.g. 165" required>
+                                <div class="form-hint">Feet to cm: multiply by 30.48</div>
+                            </div>
+                            <div class="col-md-3 field-group">
+                                <label class="form-label">Weight (kg)</label>
+                                <input type="number" class="form-control" id="weight"
+                                       min="30" max="180" placeholder="e.g. 70" required>
+                                <div class="form-hint">Pounds to kg: divide by 2.205</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blood Pressure -->
+                    <div class="section-divider">🩺 Blood Pressure</div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-6 field-group">
+                                <label class="form-label">Systolic Blood Pressure (mmHg)</label>
+                                <input type="number" class="form-control" id="ap_hi"
+                                       min="70" max="200" placeholder="e.g. 120" required>
+                                <div class="form-hint">📌 The TOP number on your BP reading — e.g. if your BP is 120/80, enter 120. Normal range: below 120 mmHg</div>
+                            </div>
+                            <div class="col-md-6 field-group">
+                                <label class="form-label">Diastolic Blood Pressure (mmHg)</label>
+                                <input type="number" class="form-control" id="ap_lo"
+                                       min="40" max="140" placeholder="e.g. 80" required>
+                                <div class="form-hint">📌 The BOTTOM number on your BP reading — e.g. if your BP is 120/80, enter 80. Normal range: below 80 mmHg</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lab Results -->
+                    <div class="section-divider">🔬 Lab Results</div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-6 field-group">
+                                <label class="form-label">Cholesterol Level</label>
+                                <select class="form-select" id="cholesterol" required>
+                                    <option value="">Select your level</option>
+                                    <option value="1">Normal — below 200 mg/dL</option>
+                                    <option value="2">Above Normal — 200 to 239 mg/dL</option>
+                                    <option value="3">Well Above Normal — 240 mg/dL or higher</option>
+                                </select>
+                                <div class="form-hint">📌 Check your blood test report for "Total Cholesterol". If unsure, select Normal</div>
+                            </div>
+                            <div class="col-md-6 field-group">
+                                <label class="form-label">Glucose (Blood Sugar) Level</label>
+                                <select class="form-select" id="gluc" required>
+                                    <option value="">Select your level</option>
+                                    <option value="1">Normal — below 100 mg/dL</option>
+                                    <option value="2">Above Normal — 100 to 125 mg/dL</option>
+                                    <option value="3">Well Above Normal — 126 mg/dL or higher</option>
+                                </select>
+                                <div class="form-hint">📌 Check your blood test report for "Fasting Blood Sugar (FBS)". If unsure, select Normal</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lifestyle -->
+                    <div class="section-divider">🏃 Lifestyle Factors</div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-4 field-group">
+                                <label class="form-label">Do You Smoke?</label>
+                                <select class="form-select" id="smoke" required>
+                                    <option value="">Select</option>
+                                    <option value="0">No — I don't smoke</option>
+                                    <option value="1">Yes — I currently smoke</option>
+                                </select>
+                                <div class="form-hint">Include cigarettes, cigars, or any tobacco</div>
+                            </div>
+                            <div class="col-md-4 field-group">
+                                <label class="form-label">Do You Drink Alcohol?</label>
+                                <select class="form-select" id="alco" required>
+                                    <option value="">Select</option>
+                                    <option value="0">No — I don't drink</option>
+                                    <option value="1">Yes — I drink regularly</option>
+                                </select>
+                                <div class="form-hint">Regular means more than occasionally</div>
+                            </div>
+                            <div class="col-md-4 field-group">
+                                <label class="form-label">Are You Physically Active?</label>
+                                <select class="form-select" id="active" required>
+                                    <option value="">Select</option>
+                                    <option value="1">Yes — I exercise regularly</option>
+                                    <option value="0">No — I am mostly sedentary</option>
+                                </select>
+                                <div class="form-hint">Regular = at least 30 min, 3x per week</div>
+                            </div>
+                        </div>
+
+                        <div class="loading" id="loadingMsg">
+                            ⏳ Analysing your health data...
+                        </div>
+
+                        <button type="submit" class="btn btn-predict">
+                            🔍 Calculate My Cardiovascular Risk
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Result Card -->
+            <div class="result-card" id="resultCard">
+                <div class="result-header" id="resultHeader">
+                    <div class="risk-score-text" id="riskScore"></div>
+                    <div class="risk-level-text" id="riskLabel"></div>
+                </div>
+                <div class="result-body">
+                    <div class="result-message" id="riskMessage"></div>
+                    <div class="disclaimer mt-3 mb-0">
+                        ⚠️ This result is for informational purposes only and is not a medical diagnosis.
+                        Please consult your doctor to discuss these results.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>❤️ CardioPredict AI &nbsp;|&nbsp; BCA Final Year Project &nbsp;|&nbsp; For Educational Purposes Only</p>
+    <p style="margin-top:6px; font-size:12px;">Model trained on 68,517 patient records &nbsp;|&nbsp; XGBoost Classifier &nbsp;|&nbsp; AUC: 0.806</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('predictForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Show loading
+        document.getElementById('loadingMsg').style.display = 'block';
+        document.getElementById('resultCard').style.display = 'none';
+
+        const data = {
+            age: parseInt(document.getElementById('age').value),
+            gender: parseInt(document.getElementById('gender').value),
+            height: parseInt(document.getElementById('height').value),
+            weight: parseFloat(document.getElementById('weight').value),
+            ap_hi: parseInt(document.getElementById('ap_hi').value),
+            ap_lo: parseInt(document.getElementById('ap_lo').value),
+            cholesterol: parseInt(document.getElementById('cholesterol').value),
+            gluc: parseInt(document.getElementById('gluc').value),
+            smoke: parseInt(document.getElementById('smoke').value),
+            alco: parseInt(document.getElementById('alco').value),
+            active: parseInt(document.getElementById('active').value)
+        };
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            // Hide loading
+            document.getElementById('loadingMsg').style.display = 'none';
+
+            // Update result
+            document.getElementById('riskScore').textContent = result.risk_score + '%';
+            document.getElementById('riskLabel').textContent = result.risk_level + ' Risk';
+
+            const card = document.getElementById('resultCard');
+            card.className = 'result-card';
+
+            if (result.risk_level === 'Low') {
+                card.classList.add('result-low');
+                document.getElementById('riskMessage').textContent =
+                    '✅ Your cardiovascular risk is low. Keep maintaining your healthy lifestyle with regular exercise, a balanced diet, and routine checkups.';
+            } else if (result.risk_level === 'Moderate') {
+                card.classList.add('result-moderate');
+                document.getElementById('riskMessage').textContent =
+                    '⚠️ You have a moderate cardiovascular risk. Consider lifestyle improvements such as increasing physical activity, improving diet, and scheduling a checkup with your doctor.';
+            } else if (result.risk_level === 'High') {
+                card.classList.add('result-high');
+                document.getElementById('riskMessage').textContent =
+                    '🔴 You have a high cardiovascular risk. We strongly recommend consulting your doctor soon. Focus on managing your blood pressure, cholesterol, and lifestyle factors.';
+            } else {
+                card.classList.add('result-veryhigh');
+                document.getElementById('riskMessage').textContent =
+                    '🚨 You have a very high cardiovascular risk. Please seek medical attention promptly. Do not ignore these results — speak with a healthcare professional as soon as possible.';
+            }
+
+            card.style.display = 'block';
+            card.scrollIntoView({ behavior: 'smooth' });
+
+        } catch (error) {
+            document.getElementById('loadingMsg').style.display = 'none';
+            alert('❌ Error connecting to API. Please make sure the Flask server is running!');
+        }
+    });
+</script>
+
+</body>
+</html>
