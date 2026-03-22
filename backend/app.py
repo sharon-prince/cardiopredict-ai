@@ -1,11 +1,13 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import joblib
 import json
 import numpy as np
+from datetime import timezone, timedelta
+IST = timezone(timedelta(hours=5, minutes=30))
 import os
 from models import db, User, Prediction
 
@@ -19,11 +21,11 @@ DB_PATH = os.path.join(BASE_DIR, '..', 'database', 'cardiopredict.db')
 app.config['SECRET_KEY'] = 'cardiopredict-secret-key-2026'
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 # ── Initialize Extensions ────────────────────────────────────
 db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
 
 # ── Load Model & Scaler ──────────────────────────────────────
 model = joblib.load(os.path.join(BASE_DIR, 'models/xgb_model.pkl'))
@@ -72,7 +74,6 @@ def get_risk_level(probability):
 # AUTH ROUTES
 # ══════════════════════════════════════════════════════════════
 
-# ── Register ─────────────────────────────────────────────────
 @app.route('/api/register', methods=['POST'])
 def register():
     try:
@@ -84,11 +85,9 @@ def register():
         if not full_name or not email or not password:
             return jsonify({"error": "All fields are required"}), 400
 
-        # Check if email already exists
         if User.query.filter_by(email=email).first():
             return jsonify({"error": "Email already registered"}), 400
 
-        # Create new user
         hashed_password = generate_password_hash(password)
         new_user = User(
             full_name=full_name,
@@ -106,7 +105,6 @@ def register():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ── Login ─────────────────────────────────────────────────────
 @app.route('/api/login', methods=['POST'])
 def login():
     try:
@@ -122,20 +120,21 @@ def login():
         login_user(user)
         return jsonify({
             "message": "Login successful!",
-            "user": {"name": user.full_name, "email": user.email, "id": user.id}
+            "user": {
+                "name": user.full_name,
+                "email": user.email,
+                "id": user.id
+            }
         })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ── Logout ───────────────────────────────────────────────────
 @app.route('/api/logout', methods=['POST'])
-@login_required
 def logout():
     logout_user()
     return jsonify({"message": "Logged out successfully"})
 
-# ── Get Current User ─────────────────────────────────────────
 @app.route('/api/me', methods=['GET'])
 def get_current_user():
     if current_user.is_authenticated:
@@ -175,10 +174,11 @@ def predict():
         risk_score = round(float(probability * 100), 1)
         risk_level = get_risk_level(probability)
 
-        # Save to database if user is logged in
-        if current_user.is_authenticated:
+        # Save to database if user_id provided
+        user_id = data.get('user_id')
+        if user_id:
             prediction = Prediction(
-                user_id=current_user.id,
+                user_id=user_id,
                 age=data['age'],
                 gender=data['gender'],
                 height=data['height'],
@@ -202,31 +202,193 @@ def predict():
             "risk_level": risk_level,
             "probability": round(float(probability), 4),
             "message": "Prediction successful",
-            "saved": current_user.is_authenticated
+            "saved": user_id is not None
         })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ── Get Prediction History ────────────────────────────────────
 @app.route('/api/history', methods=['GET'])
-@login_required
 def get_history():
-    predictions = Prediction.query.filter_by(
-        user_id=current_user.id
-    ).order_by(Prediction.created_at.desc()).limit(10).all()
+    try:
+        user_id = request.args.get('user_id')
+        if not user_id:
+            return jsonify({"error": "User ID required"}), 400
 
-    history = []
-    for p in predictions:
-        history.append({
-            "id": p.id,
-            "risk_score": p.risk_score,
-            "risk_level": p.risk_level,
-            "age": p.age,
-            "date": p.created_at.strftime("%d %b %Y, %I:%M %p")
+        predictions = Prediction.query.filter_by(
+            user_id=int(user_id)
+        ).order_by(Prediction.created_at.desc()).limit(10).all()
+
+        history = []
+        for p in predictions:
+            history.append({
+                "id": p.id,
+                "risk_score": p.risk_score,
+                "risk_level": p.risk_level,
+                "age": p.age,
+                "date": p.created_at.replace(tzinfo=timezone.utc).astimezone(IST).strftime("%d %b %Y, %I:%M %p")
+            })
+
+        return jsonify({"history": history})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+# ══════════════════════════════════════════════════════════════
+# TRIAGE ROUTES
+# ══════════════════════════════════════════════════════════════
+
+@app.route('/api/triage', methods=['POST'])
+def triage():
+    try:
+        data = request.get_json()
+
+        # Get symptoms
+        chest_pain = int(data.get('chest_pain', 0))
+        chest_pain_severity = int(data.get('chest_pain_severity', 0))
+        radiating_pain = int(data.get('radiating_pain', 0))
+        shortness_of_breath = int(data.get('shortness_of_breath', 0))
+        breath_severity = data.get('breath_severity', 'none')
+        palpitations = int(data.get('palpitations', 0))
+        dizziness = int(data.get('dizziness', 0))
+        fainting = int(data.get('fainting', 0))
+        sweating = int(data.get('sweating', 0))
+        nausea = int(data.get('nausea', 0))
+        fatigue = int(data.get('fatigue', 0))
+
+        # Get vitals
+        heart_rate = int(data.get('heart_rate', 0))
+        systolic_bp = int(data.get('systolic_bp', 0))
+
+        # Get context
+        symptom_duration = data.get('symptom_duration', 'hours')
+        cardiac_history = int(data.get('cardiac_history', 0))
+
+        # ── Triage Logic ─────────────────────────────────────
+
+        # EMERGENCY conditions
+        emergency = False
+        emergency_reasons = []
+
+        if chest_pain and chest_pain_severity >= 7:
+            emergency = True
+            emergency_reasons.append("Severe chest pain")
+
+        if chest_pain and radiating_pain:
+            emergency = True
+            emergency_reasons.append("Chest pain radiating to arm/jaw")
+
+        if chest_pain and shortness_of_breath and breath_severity == 'severe':
+            emergency = True
+            emergency_reasons.append("Chest pain with severe shortness of breath")
+
+        if fainting:
+            emergency = True
+            emergency_reasons.append("Fainting episode")
+
+        if heart_rate > 150 or heart_rate < 40:
+            if heart_rate > 0:
+                emergency = True
+                emergency_reasons.append(f"Dangerous heart rate: {heart_rate} BPM")
+
+        if systolic_bp > 180:
+            if systolic_bp > 0:
+                emergency = True
+                emergency_reasons.append(f"Severely high BP: {systolic_bp} mmHg")
+
+        if emergency:
+            return jsonify({
+                "triage_level": "Emergency",
+                "color": "red",
+                "action": "Call 911 immediately or go to the nearest Emergency Room",
+                "wait_time": "Immediate — do not wait",
+                "reasons": emergency_reasons,
+                "advice": [
+                    "Call emergency services (911) immediately",
+                    "Do not drive yourself to the hospital",
+                    "Chew an aspirin if not allergic",
+                    "Sit down and stay calm",
+                    "Have someone stay with you"
+                ]
+            })
+
+        # URGENT conditions
+        urgent = False
+        urgent_reasons = []
+
+        if chest_pain and chest_pain_severity >= 4:
+            urgent = True
+            urgent_reasons.append("Moderate chest pain")
+
+        if shortness_of_breath and breath_severity in ['moderate', 'severe']:
+            urgent = True
+            urgent_reasons.append("Significant shortness of breath")
+
+        if palpitations and cardiac_history:
+            urgent = True
+            urgent_reasons.append("Palpitations with cardiac history")
+
+        if dizziness and chest_pain:
+            urgent = True
+            urgent_reasons.append("Dizziness with chest pain")
+
+        if heart_rate > 120:
+            if heart_rate > 0:
+                urgent = True
+                urgent_reasons.append(f"Elevated heart rate: {heart_rate} BPM")
+
+        if systolic_bp > 160:
+            if systolic_bp > 0:
+                urgent = True
+                urgent_reasons.append(f"High blood pressure: {systolic_bp} mmHg")
+
+        if symptom_duration == 'now' and (chest_pain or shortness_of_breath):
+            urgent = True
+            urgent_reasons.append("Sudden onset of cardiac symptoms")
+
+        if urgent:
+            return jsonify({
+                "triage_level": "Urgent",
+                "color": "orange",
+                "action": "Visit Emergency Room or Urgent Care within 2 hours",
+                "wait_time": "Within 1-2 hours",
+                "reasons": urgent_reasons,
+                "advice": [
+                    "Go to Emergency Room or Urgent Care now",
+                    "Do not wait until tomorrow",
+                    "Bring list of current medications",
+                    "Have someone drive you",
+                    "Monitor symptoms — call 911 if they worsen"
+                ]
+            })
+
+        # NON-URGENT
+        non_urgent_reasons = []
+        if chest_pain: non_urgent_reasons.append("Mild chest discomfort")
+        if palpitations: non_urgent_reasons.append("Occasional palpitations")
+        if fatigue: non_urgent_reasons.append("Fatigue reported")
+        if nausea: non_urgent_reasons.append("Nausea reported")
+        if dizziness: non_urgent_reasons.append("Mild dizziness")
+        if not non_urgent_reasons:
+            non_urgent_reasons.append("No significant cardiac symptoms detected")
+
+        return jsonify({
+            "triage_level": "Non-Urgent",
+            "color": "green",
+            "action": "Schedule an appointment with your doctor within 1-2 weeks",
+            "wait_time": "Within 1-2 weeks",
+            "reasons": non_urgent_reasons,
+            "advice": [
+                "Schedule a checkup with your primary care doctor",
+                "Monitor your symptoms — note if they worsen",
+                "Maintain a record of when symptoms occur",
+                "If symptoms suddenly worsen, seek immediate care",
+                "Consider lifestyle modifications"
+            ]
         })
 
-    return jsonify({"history": history})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # ══════════════════════════════════════════════════════════════
 # GENERAL ROUTES

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — CardioPredict AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0F2044 0%, #1a56db 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+        }
+        .brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .brand h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0F2044;
+        }
+        .brand p {
+            color: #64748B;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 13.5px;
+            color: #1E293B;
+        }
+        .form-control {
+            border: 1.5px solid #CBD5E1;
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-size: 14px;
+        }
+        .form-control:focus {
+            border-color: #1a56db;
+            box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #1a56db, #0F2044);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 13px;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26,86,219,0.35);
+            color: white;
+        }
+        .divider {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 13px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 42%;
+            height: 1px;
+            background: #E2E8F0;
+        }
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+        .btn-register {
+            background: white;
+            color: #1a56db;
+            border: 2px solid #1a56db;
+            border-radius: 10px;
+            padding: 11px;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .btn-register:hover {
+            background: #EFF6FF;
+            color: #1a56db;
+        }
+        .alert-box {
+            display: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .alert-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+        }
+        .alert-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+
+        <!-- Brand -->
+        <div class="brand">
+            <h1>❤️ CardioPredict AI</h1>
+            <p>Sign in to your account</p>
+        </div>
+
+        <!-- Alert Box -->
+        <div class="alert-box" id="alertBox"></div>
+
+        <!-- Login Form -->
+        <div id="loginForm">
+            <div class="mb-3">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="loginEmail"
+                       placeholder="you@example.com">
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" id="loginPassword"
+                       placeholder="Enter your password">
+            </div>
+            <button class="btn-login" onclick="handleLogin()">
+                Sign In
+            </button>
+            <div class="divider">or</div>
+            <button class="btn-register" onclick="showRegister()">
+                Create New Account
+            </button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" style="display:none;">
+            <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="regName"
+                       placeholder="Your full name">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="regEmail"
+                       placeholder="you@example.com">
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" id="regPassword"
+                       placeholder="At least 6 characters">
+            </div>
+            <button class="btn-login" onclick="handleRegister()">
+                Create Account
+            </button>
+            <div class="divider">or</div>
+            <button class="btn-register" onclick="showLogin()">
+                Already have an account? Sign In
+            </button>
+        </div>
+
+        <!-- Back to Home -->
+        <p style="text-align:center; margin-top:20px; font-size:13px; color:#94A3B8;">
+            <a href="index.html" style="color:#1a56db; text-decoration:none;">
+                ← Back to Home
+            </a>
+        </p>
+
+    </div>
+
+<script>
+    function showAlert(message, type) {
+        const box = document.getElementById('alertBox');
+        box.className = `alert-box ${type === 'error' ? 'alert-error' : 'alert-success'}`;
+        box.textContent = message;
+        box.style.display = 'block';
+    }
+
+    function showRegister() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('alertBox').style.display = 'none';
+    }
+
+    function showLogin() {
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('alertBox').style.display = 'none';
+    }
+
+    async function handleLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        if (!email || !password) {
+            showAlert('Please fill in all fields', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Save user info to localStorage
+                localStorage.setItem('user', JSON.stringify(result.user));
+                showAlert('Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                showAlert(result.error || 'Login failed', 'error');
+            }
+        } catch (error) {
+    showAlert('Invalid email or password. Please try again.', 'error');
+}
+    }
+
+    async function handleRegister() {
+        const full_name = document.getElementById('regName').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+
+        if (!full_name || !email || !password) {
+            showAlert('Please fill in all fields', 'error');
+            return;
+        }
+
+        if (password.length < 6) {
+            showAlert('Password must be at least 6 characters', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ full_name, email, password })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                showAlert('Account created! Please sign in.', 'success');
+                setTimeout(() => showLogin(), 1500);
+            } else {
+                showAlert(result.error || 'Registration failed', 'error');
+            }
+        } catch (error) {
+    showAlert('Registration failed. Please try again.', 'error');
+}
+    }
+
+    // Check if already logged in
+    const user = localStorage.getItem('user');
+    if (user) {
+        window.location.href = 'index.html';
+    }
+</script>
+
+</body>
+</html>

@@ -241,7 +241,26 @@
 <nav class="navbar navbar-dark">
     <div class="container d-flex justify-content-between align-items-center">
         <span class="navbar-brand">❤️ CardioPredict AI</span>
-        <span class="nav-badge">BCA Final Year Project</span>
+        <div class="d-flex align-items-center gap-3">
+            <!-- Shown when NOT logged in -->
+            <div id="guestNav">
+                <a href="login.html" style="color:white; font-size:14px; 
+                text-decoration:none; background:rgba(255,255,255,0.15); 
+                padding:6px 16px; border-radius:20px;">
+                    Sign In
+                </a>
+            </div>
+            <!-- Shown when logged in -->
+            <div id="userNav" style="display:none;">
+                <span style="color:white; font-size:14px;" id="navUsername"></span>
+                <button onclick="handleLogout()" style="color:white; 
+                font-size:13px; background:rgba(255,255,255,0.15); 
+                border:none; padding:6px 16px; border-radius:20px; 
+                margin-left:10px; cursor:pointer;">
+                    Logout
+                </button>
+            </div>
+        </div>
     </div>
 </nav>
 
@@ -427,6 +446,17 @@
                     </div>
                 </div>
             </div>
+            <!-- History Section -->
+            <div id="historySection" style="display:none; margin-top:30px;">
+                <div class="main-card">
+                    <div class="section-header">
+                        📊 Your Recent Assessments
+                    </div>
+                    <div class="section-body">
+                        <div id="historyList"></div>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -438,6 +468,7 @@
     <p style="margin-top:6px; font-size:12px;">Model trained on 68,517 patient records &nbsp;|&nbsp; XGBoost Classifier &nbsp;|&nbsp; AUC: 0.806</p>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.getElementById('predictForm').addEventListener('submit', async function(e) {
@@ -460,6 +491,12 @@
             alco: parseInt(document.getElementById('alco').value),
             active: parseInt(document.getElementById('active').value)
         };
+
+        // Add user_id if logged in
+        const userStored = localStorage.getItem('user');
+        if (userStored) {
+            data.user_id = JSON.parse(userStored).id;
+        }
 
         try {
             const response = await fetch('http://127.0.0.1:5000/predict', {
@@ -499,6 +536,10 @@
             }
 
             card.style.display = 'block';
+
+            // Reload history after new prediction
+            await loadHistory();
+
             card.scrollIntoView({ behavior: 'smooth' });
 
         } catch (error) {
@@ -506,6 +547,82 @@
             alert('❌ Error connecting to API. Please make sure the Flask server is running!');
         }
     });
+
+    // ── Auth Functions ───────────────────────────────────────
+    function checkAuth() {
+        const user = localStorage.getItem('user');
+        if (user) {
+            const userData = JSON.parse(user);
+            document.getElementById('guestNav').style.display = 'none';
+            document.getElementById('userNav').style.display = 'flex';
+            document.getElementById('navUsername').textContent =
+                '👤 ' + userData.name;
+            loadHistory();
+        } else {
+            document.getElementById('guestNav').style.display = 'block';
+            document.getElementById('userNav').style.display = 'none';
+        }
+    }
+
+    async function loadHistory() {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) return;
+
+            const response = await fetch(`http://127.0.0.1:5000/api/history?user_id=${user.id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const result = await response.json();
+
+            if (result.history && result.history.length > 0) {
+                document.getElementById('historySection').style.display = 'block';
+
+                const colors = {
+                    'Low': '#10B981',
+                    'Moderate': '#F59E0B',
+                    'High': '#EF4444',
+                    'Very High': '#DC2626'
+                };
+
+                const html = result.history.map(p => `
+                    <div style="display:flex; justify-content:space-between;
+                    align-items:center; padding:12px 0;
+                    border-bottom:1px solid #E2E8F0;">
+                        <div>
+                            <span style="font-weight:600; color:${colors[p.risk_level]};
+                            font-size:18px;">${p.risk_score}%</span>
+                            <span style="margin-left:10px; font-size:14px;
+                            color:#64748B;">${p.risk_level} Risk</span>
+                        </div>
+                        <div style="font-size:13px; color:#94A3B8;">
+                            Age ${p.age} &nbsp;|&nbsp; ${p.date}
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('historyList').innerHTML = html;
+            }
+        } catch(e) {
+            console.log('History not available:', e);
+        }
+    }
+
+    async function handleLogout() {
+        try {
+            await fetch('http://127.0.0.1:5000/api/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch(e) {}
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    }
+
+    // Run on page load
+    checkAuth();
+
 </script>
 
 </body>
