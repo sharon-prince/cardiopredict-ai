@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations — CardioPredict AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background-color: #F1F5F9; }
+
+        .navbar {
+            background: linear-gradient(90deg, #0F2044, #1a3a6e);
+            padding: 14px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .navbar-brand { font-size: 22px; font-weight: 700; }
+
+        .hero {
+            background: linear-gradient(135deg, #065F46 0%, #10B981 100%);
+            color: white;
+            padding: 50px 0 35px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 34px; font-weight: 700; }
+        .hero p { font-size: 16px; opacity: 0.85; max-width: 500px; margin: 10px auto 0; }
+
+        .main-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .section-header {
+            background: linear-gradient(90deg, #0F2044, #1a3a6e);
+            color: white;
+            padding: 14px 24px;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .section-body { padding: 24px; }
+
+        /* Risk Score Banner */
+        .risk-banner {
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .risk-low { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); border: 2px solid #10B981; }
+        .risk-moderate { background: linear-gradient(135deg, #FEF3C7, #FDE68A); border: 2px solid #F59E0B; }
+        .risk-high { background: linear-gradient(135deg, #FEE2E2, #FECACA); border: 2px solid #EF4444; }
+        .risk-veryhigh { background: linear-gradient(135deg, #FECACA, #FCA5A5); border: 2px solid #DC2626; }
+
+        .risk-score-big {
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1;
+            color: #1E293B;
+        }
+        .risk-level-big {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-top: 4px;
+        }
+
+        /* Priority Actions */
+        .priority-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .priority-num {
+            background: linear-gradient(135deg, #1E3A5F, #2563EB);
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .priority-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1E293B;
+            line-height: 1.5;
+        }
+
+        /* Recommendation Items */
+        .rec-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid #F1F5F9;
+            gap: 12px;
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.6;
+        }
+        .rec-item:last-child { border-bottom: none; }
+        .rec-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        /* Category Headers */
+        .cat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .cat-icon {
+            font-size: 24px;
+        }
+        .cat-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1E293B;
+        }
+
+        /* Tab Navigation */
+        .rec-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        .rec-tab {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid #E2E8F0;
+            background: white;
+            color: #64748B;
+            transition: all 0.2s;
+        }
+        .rec-tab.active {
+            background: linear-gradient(135deg, #1E3A5F, #2563EB);
+            color: white;
+            border-color: transparent;
+        }
+        .rec-tab:hover:not(.active) {
+            border-color: #2563EB;
+            color: #2563EB;
+        }
+        .rec-panel { display: none; }
+        .rec-panel.active { display: block; }
+
+        .disclaimer {
+            background: #FFFBEB;
+            border-left: 4px solid #F59E0B;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #78350F;
+            margin-bottom: 24px;
+        }
+
+        footer {
+            background: #0F2044;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 24px;
+            font-size: 13px;
+            margin-top: 60px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #10B981;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94A3B8;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-dark">
+    <div class="container d-flex justify-content-between align-items-center">
+        <span class="navbar-brand">❤️ CardioPredict AI</span>
+        <a href="index.html" style="color:white; font-size:14px;
+        text-decoration:none; background:rgba(255,255,255,0.15);
+        padding:6px 16px; border-radius:20px;">
+            ← Back to Assessment
+        </a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="container">
+        <h1>💊 Your Personalised Health Plan</h1>
+        <p>Tailored recommendations based on your cardiovascular risk profile</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                ⚠️ <strong>Important:</strong> These recommendations are for informational
+                purposes only. Always consult your doctor before making significant changes
+                to your diet, exercise routine or medications.
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading" id="loadingState">
+                ⏳ Loading your personalised recommendations...
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <div style="font-size:48px;">📋</div>
+                <h5 style="margin-top:16px; color:#1E293B;">No Assessment Found</h5>
+                <p>Please complete a risk assessment first to get personalised recommendations.</p>
+                <a href="index.html" class="btn" style="background: linear-gradient(135deg, #1E3A5F, #2563EB); color:white; border-radius:10px; padding:10px 28px; margin-top:12px;">
+                    Go to Assessment
+                </a>
+            </div>
+
+            <!-- Recommendations Content -->
+            <div id="recContent" style="display:none;">
+
+                <!-- Risk Banner -->
+                <div class="risk-banner" id="riskBanner">
+                    <div>
+                        <div style="font-size:13px; color:#64748B; font-weight:600; margin-bottom:4px;">YOUR RISK SCORE</div>
+                        <div class="risk-score-big" id="bannerScore"></div>
+                        <div class="risk-level-big" id="bannerLevel"></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:13px; color:#64748B;">Recommendations tailored to</div>
+                        <div style="font-size:15px; font-weight:600; color:#1E293B; margin-top:4px;">Your specific risk factors</div>
+                        <a href="index.html" style="font-size:13px; color:#2563EB; text-decoration:none; margin-top:8px; display:block;">
+                            Reassess →
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Priority Actions -->
+                <div class="main-card">
+                    <div class="section-header">
+                        🎯 Your Top Priority Actions
+                    </div>
+                    <div class="section-body">
+                        <p style="font-size:14px; color:#64748B; margin-bottom:20px;">
+                            Focus on these first — they will have the biggest impact on your heart health.
+                        </p>
+                        <div id="priorityList"></div>
+                    </div>
+                </div>
+
+                <!-- Detailed Recommendations -->
+                <div class="main-card">
+                    <div class="section-header">
+                        📋 Detailed Recommendations
+                    </div>
+                    <div class="section-body">
+
+                        <!-- Tabs -->
+                        <div class="rec-tabs">
+                            <div class="rec-tab active" onclick="showTab('diet')">🥗 Diet</div>
+                            <div class="rec-tab" onclick="showTab('exercise')">🏃 Exercise</div>
+                            <div class="rec-tab" onclick="showTab('lifestyle')">🌿 Lifestyle</div>
+                            <div class="rec-tab" onclick="showTab('monitoring')">📊 Monitoring</div>
+                        </div>
+
+                        <!-- Diet Panel -->
+                        <div class="rec-panel active" id="panel-diet">
+                            <div class="cat-header">
+                                <span class="cat-icon">🥗</span>
+                                <span class="cat-title">Diet & Nutrition</span>
+                            </div>
+                            <div id="dietList"></div>
+                        </div>
+
+                        <!-- Exercise Panel -->
+                        <div class="rec-panel" id="panel-exercise">
+                            <div class="cat-header">
+                                <span class="cat-icon">🏃</span>
+                                <span class="cat-title">Physical Activity</span>
+                            </div>
+                            <div id="exerciseList"></div>
+                        </div>
+
+                        <!-- Lifestyle Panel -->
+                        <div class="rec-panel" id="panel-lifestyle">
+                            <div class="cat-header">
+                                <span class="cat-icon">🌿</span>
+                                <span class="cat-title">Lifestyle Modifications</span>
+                            </div>
+                            <div id="lifestyleList"></div>
+                        </div>
+
+                        <!-- Monitoring Panel -->
+                        <div class="rec-panel" id="panel-monitoring">
+                            <div class="cat-header">
+                                <span class="cat-icon">📊</span>
+                                <span class="cat-title">Health Monitoring</span>
+                            </div>
+                            <div id="monitoringList"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>❤️ CardioPredict AI &nbsp;|&nbsp; BCA Final Year Project &nbsp;|&nbsp; For Educational Purposes Only</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── Tab Switching ────────────────────────────────────────
+    function showTab(tab) {
+        document.querySelectorAll('.rec-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.rec-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('panel-' + tab).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // ── Render List Items ─────────────────────────────────────
+    function renderList(items, containerId, dotColor) {
+        const container = document.getElementById(containerId);
+        if (!items || items.length === 0) {
+            container.innerHTML = '<p style="color:#94A3B8; font-size:14px;">No specific recommendations for this category.</p>';
+            return;
+        }
+        container.innerHTML = items.map(item => `
+            <div class="rec-item">
+                <div class="rec-dot" style="background:${dotColor};"></div>
+                <div>${item}</div>
+            </div>
+        `).join('');
+    }
+
+    // ── Load Recommendations ──────────────────────────────────
+    async function loadRecommendations() {
+        // Get last prediction from localStorage
+        const lastPrediction = localStorage.getItem('lastPrediction');
+
+        if (!lastPrediction) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+            return;
+        }
+
+        const prediction = JSON.parse(lastPrediction);
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/recommendations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(prediction)
+            });
+
+            const result = await response.json();
+
+            // Hide loading
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('recContent').style.display = 'block';
+
+            // Risk Banner
+            const banner = document.getElementById('riskBanner');
+            banner.className = 'risk-banner';
+            if (result.risk_level === 'Low') banner.classList.add('risk-low');
+            else if (result.risk_level === 'Moderate') banner.classList.add('risk-moderate');
+            else if (result.risk_level === 'High') banner.classList.add('risk-high');
+            else banner.classList.add('risk-veryhigh');
+
+            document.getElementById('bannerScore').textContent = result.risk_score + '%';
+            document.getElementById('bannerLevel').textContent = result.risk_level + ' Risk';
+
+            // Priority Actions
+            const priorityList = document.getElementById('priorityList');
+            priorityList.innerHTML = result.priority_actions.map((action, i) => `
+                <div class="priority-card">
+                    <div class="priority-num">${i + 1}</div>
+                    <div class="priority-text">${action}</div>
+                </div>
+            `).join('');
+
+            // Detailed Recommendations
+            renderList(result.diet, 'dietList', '#10B981');
+            renderList(result.exercise, 'exerciseList', '#2563EB');
+            renderList(result.lifestyle, 'lifestyleList', '#8B5CF6');
+            renderList(result.monitoring, 'monitoringList', '#F59E0B');
+
+        } catch (error) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+        }
+    }
+
+    // Run on page load
+    loadRecommendations();
+</script>
+
+</body>
+</html>

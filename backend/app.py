@@ -389,6 +389,145 @@ def triage():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+# ══════════════════════════════════════════════════════════════
+# RECOMMENDATIONS ROUTES
+# ══════════════════════════════════════════════════════════════
+
+@app.route('/api/recommendations', methods=['POST'])
+def recommendations():
+    try:
+        data = request.get_json()
+
+        risk_level = data.get('risk_level', 'Low')
+        risk_score = float(data.get('risk_score', 0))
+        cholesterol = int(data.get('cholesterol', 1))
+        gluc = int(data.get('gluc', 1))
+        smoke = int(data.get('smoke', 0))
+        alco = int(data.get('alco', 0))
+        active = int(data.get('active', 1))
+        age = int(data.get('age', 40))
+        bmi = float(data.get('bmi', 22))
+        ap_hi = int(data.get('ap_hi', 120))
+
+        diet = []
+        exercise = []
+        lifestyle = []
+        monitoring = []
+        priority_actions = []
+
+        # ── Diet Recommendations ─────────────────────────────
+        if cholesterol >= 2:
+            diet.append("Reduce saturated fats — avoid red meat, full-fat dairy and fried foods")
+            diet.append("Increase soluble fibre — eat oats, beans, lentils and barley daily")
+            diet.append("Add omega-3 rich foods — salmon, mackerel or walnuts 2-3 times per week")
+            diet.append("Include nuts and seeds — a small handful of almonds daily can lower LDL")
+            priority_actions.append("Lower your cholesterol through diet — reduce saturated fats and increase fibre")
+
+        if gluc >= 2:
+            diet.append("Limit refined carbohydrates — avoid white bread, white rice and sugary drinks")
+            diet.append("Choose low glycaemic index foods — sweet potato, brown rice, whole grain bread")
+            diet.append("Eat smaller, more frequent meals to keep blood sugar stable")
+            priority_actions.append("Manage your blood sugar — cut refined carbs and sugary foods")
+
+        if ap_hi >= 140:
+            diet.append("Reduce sodium intake — target less than 2,300 mg per day")
+            diet.append("Follow the DASH diet — rich in fruits, vegetables, whole grains and low-fat dairy")
+            diet.append("Increase potassium-rich foods — bananas, sweet potatoes and spinach help lower BP")
+            priority_actions.append("Lower your blood pressure through the DASH diet and sodium reduction")
+
+        if bmi >= 25:
+            diet.append("Aim for a calorie deficit of 300-500 calories per day for gradual weight loss")
+            diet.append("Replace processed snacks with whole foods — fruits, vegetables and nuts")
+            diet.append("Practice portion control — use smaller plates and eat slowly")
+
+        if not diet:
+            diet.append("Maintain your healthy diet — continue eating plenty of fruits and vegetables")
+            diet.append("Stay hydrated — drink at least 8 glasses of water daily")
+            diet.append("Limit processed foods and added sugars as a preventive measure")
+
+        # ── Exercise Recommendations ─────────────────────────
+        if active == 0:
+            if age >= 60:
+                exercise.append("Start with gentle walks — 10 minutes, 3 times per day is a great beginning")
+                exercise.append("Try chair yoga or tai chi — low impact, improves balance and flexibility")
+                exercise.append("Gradually increase to 30 minutes of light activity most days of the week")
+            else:
+                exercise.append("Begin with 15-minute walks daily — consistency matters more than intensity")
+                exercise.append("Progress to 30 minutes of moderate activity (brisk walking, cycling) 5 days/week")
+                exercise.append("Consider swimming — excellent full-body, low-impact cardiovascular workout")
+            priority_actions.append("Start exercising regularly — even 15 minutes of walking daily makes a difference")
+        else:
+            exercise.append("Maintain your current activity level — you are meeting basic recommendations")
+            exercise.append("Consider adding strength training 2 days per week to complement cardio")
+            exercise.append("Try interval training — alternating moderate and brisk pace improves heart health")
+
+        if risk_level in ["High", "Very High"]:
+            exercise.append("Consult your doctor before starting any new exercise programme at your risk level")
+            exercise.append("Avoid heavy weightlifting and high-intensity interval training until medically cleared")
+
+        # ── Lifestyle Recommendations ────────────────────────
+        if smoke == 1:
+            lifestyle.append("Quit smoking — cardiovascular risk reduces by 50% within just 1 year of quitting")
+            lifestyle.append("Seek support — nicotine replacement therapy doubles your chances of success")
+            lifestyle.append("Avoid secondhand smoke environments as much as possible")
+            priority_actions.append("Quit smoking — this single change has the biggest impact on your heart health")
+
+        if alco == 1:
+            lifestyle.append("Reduce alcohol intake — aim for no more than 1 drink per day for women, 2 for men")
+            lifestyle.append("Have at least 2-3 alcohol-free days per week")
+            lifestyle.append("Replace alcoholic drinks with sparkling water, herbal tea or fresh juices")
+
+        lifestyle.append("Aim for 7-9 hours of quality sleep every night — poor sleep raises cardiovascular risk")
+        lifestyle.append("Practise stress management — try 10 minutes of deep breathing or meditation daily")
+        lifestyle.append("Maintain social connections — loneliness and isolation increase heart disease risk")
+
+        if bmi >= 30:
+            lifestyle.append("Set a realistic weight loss goal — losing just 5-10% of body weight significantly reduces risk")
+            priority_actions.append("Work towards a healthier weight — even modest weight loss improves heart health")
+
+        # ── Monitoring Recommendations ───────────────────────
+        if ap_hi >= 130:
+            monitoring.append("Check your blood pressure at home regularly — aim for readings below 130/80")
+            monitoring.append("Keep a BP diary — note readings, time of day and any symptoms")
+
+        if cholesterol >= 2:
+            monitoring.append("Get a full lipid panel blood test every 6 months")
+            monitoring.append("Ask your doctor about your LDL target — for high risk patients it is typically below 70 mg/dL")
+
+        if risk_level == "Very High":
+            monitoring.append("Schedule a cardiology consultation within 2 weeks")
+            monitoring.append("Do not skip any prescribed medications")
+        elif risk_level == "High":
+            monitoring.append("See your doctor within 4 weeks to discuss your cardiovascular risk")
+        elif risk_level == "Moderate":
+            monitoring.append("Schedule a general health check-up within 2-3 months")
+        else:
+            monitoring.append("Continue with your annual health check-up routine")
+
+        monitoring.append("Know your numbers — keep track of BP, cholesterol and blood sugar over time")
+        monitoring.append("Seek immediate care if you experience chest pain, breathlessness or dizziness")
+
+        # ── Top 3 Priority Actions ───────────────────────────
+        if not priority_actions:
+            priority_actions = [
+                "Maintain your current healthy habits — you are doing well",
+                "Schedule a routine annual health check-up",
+                "Continue monitoring your blood pressure and cholesterol regularly"
+            ]
+
+        return jsonify({
+            "risk_level": risk_level,
+            "risk_score": risk_score,
+            "priority_actions": priority_actions[:3],
+            "diet": diet,
+            "exercise": exercise,
+            "lifestyle": lifestyle,
+            "monitoring": monitoring
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # ══════════════════════════════════════════════════════════════
 # GENERAL ROUTES

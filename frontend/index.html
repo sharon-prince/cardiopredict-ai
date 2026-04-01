@@ -440,6 +440,13 @@
                 </div>
                 <div class="result-body">
                     <div class="result-message" id="riskMessage"></div>
+                    <div class="text-center mt-3 mb-2">
+    <a href="recommendations.html" style="background: linear-gradient(135deg, #065F46, #10B981);
+    color:white; padding:12px 32px; border-radius:10px; text-decoration:none;
+    font-weight:600; font-size:15px; display:inline-block;">
+        💊 Get Personalised Recommendations
+    </a>
+</div>
                     <div class="disclaimer mt-3 mb-0">
                         ⚠️ This result is for informational purposes only and is not a medical diagnosis.
                         Please consult your doctor to discuss these results.
@@ -506,6 +513,13 @@
             });
 
             const result = await response.json();
+            // Save prediction data for recommendations page
+localStorage.setItem('lastPrediction', JSON.stringify({
+    ...data,
+    risk_level: result.risk_level,
+    risk_score: result.risk_score,
+    bmi: parseFloat((data.weight / ((data.height / 100) ** 2)).toFixed(1))
+}));
 
             // Hide loading
             document.getElementById('loadingMsg').style.display = 'none';

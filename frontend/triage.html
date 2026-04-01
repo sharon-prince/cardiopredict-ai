@@ -441,9 +441,22 @@
         }
     }
 
-    async function assessTriage() {
-        document.getElementById('loadingMsg').style.display = 'block';
-        document.getElementById('resultCard').style.display = 'none';
+async function assessTriage() {
+
+    // Validate — at least one symptom must be selected
+    const symptoms = ['chest_pain', 'palpitations', 'shortness_of_breath',
+                      'dizziness', 'fainting', 'sweating', 'nausea', 'fatigue'];
+    const anySelected = symptoms.some(id =>
+        document.getElementById(id).checked
+    );
+
+    if (!anySelected) {
+        alert('⚠️ Please select at least one symptom before assessing.');
+        return;
+    }
+
+    document.getElementById('loadingMsg').style.display = 'block';
+    document.getElementById('resultCard').style.display = 'none';
 
         const data = {
             chest_pain: document.getElementById('chest_pain').checked ? 1 : 0,
