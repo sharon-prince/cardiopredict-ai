@@ -230,7 +230,7 @@
                 localStorage.setItem('user', JSON.stringify(result.user));
                 showAlert('Login successful! Redirecting...', 'success');
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'home.html';
                 }, 1000);
             } else {
                 showAlert(result.error || 'Login failed', 'error');
@@ -278,8 +278,8 @@
     // Check if already logged in
     const user = localStorage.getItem('user');
     if (user) {
-        window.location.href = 'index.html';
-    }
+    window.location.href = 'home.html';
+}
 </script>
 
 </body>

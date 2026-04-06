@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardioPredict AI — Your Heart Health Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background-color: #F1F5F9; margin: 0; padding: 0; }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: linear-gradient(90deg, #0F2044, #1a3a6e);
+            padding: 14px 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-brand {
+            font-size: 22px;
+            font-weight: 800;
+            color: white !important;
+            letter-spacing: 0.3px;
+        }
+        .nav-btn {
+            padding: 7px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .nav-btn-outline {
+            color: white;
+            border: 1.5px solid rgba(255,255,255,0.5);
+            background: transparent;
+        }
+        .nav-btn-outline:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-color: white;
+        }
+        .nav-btn-solid {
+            background: white;
+            color: #0F2044;
+            border: 1.5px solid white;
+        }
+        .nav-btn-solid:hover {
+            background: #E0E7FF;
+            color: #0F2044;
+        }
+        .nav-user {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .nav-logout {
+            color: rgba(255,255,255,0.75);
+            font-size: 13px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 5px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+        .nav-logout:hover { background: rgba(255,255,255,0.2); color: white; }
+
+        /* ── Hero ── */
+        .hero {
+            background: linear-gradient(135deg, #0F2044 0%, #1a56db 60%, #2563EB 100%);
+            color: white;
+            padding: 80px 0 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 18px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+        .hero h1 span { color: #93C5FD; }
+        .hero p {
+            font-size: 18px;
+            opacity: 0.85;
+            max-width: 520px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+        .hero-cta {
+            display: inline-block;
+            background: white;
+            color: #0F2044;
+            font-weight: 700;
+            font-size: 16px;
+            padding: 14px 36px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+            color: #0F2044;
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-top: 52px;
+            padding-top: 36px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+        .hero-stat .num {
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .hero-stat .lbl {
+            font-size: 13px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        /* ── How It Works ── */
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0F2044;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .section-sub {
+            font-size: 16px;
+            color: #64748B;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        /* ── Module Cards ── */
+        .module-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 28px;
+            height: 100%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1.5px solid #E2E8F0;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+            border-color: transparent;
+        }
+        .module-icon {
+            font-size: 40px;
+            margin-bottom: 18px;
+        }
+        .module-tag {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 14px;
+        }
+        .tag-blue { background: #DBEAFE; color: #1D4ED8; }
+        .tag-red { background: #FEE2E2; color: #DC2626; }
+        .tag-green { background: #D1FAE5; color: #059669; }
+        .module-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0F2044;
+            margin-bottom: 10px;
+        }
+        .module-desc {
+            font-size: 14px;
+            color: #64748B;
+            line-height: 1.7;
+            flex-grow: 1;
+            margin-bottom: 24px;
+        }
+        .module-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px;
+        }
+        .module-features li {
+            font-size: 13px;
+            color: #374151;
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .module-features li::before {
+            content: '✓';
+            color: #10B981;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .btn-module {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-blue {
+            background: linear-gradient(135deg, #1E3A5F, #2563EB);
+            color: white;
+        }
+        .btn-blue:hover {
+            box-shadow: 0 6px 20px rgba(37,99,235,0.35);
+            color: white;
+            transform: translateY(-1px);
+        }
+        .btn-red {
+            background: linear-gradient(135deg, #7F1D1D, #DC2626);
+            color: white;
+        }
+        .btn-red:hover {
+            box-shadow: 0 6px 20px rgba(220,38,38,0.35);
+            color: white;
+            transform: translateY(-1px);
+        }
+        .btn-green {
+            background: linear-gradient(135deg, #065F46, #10B981);
+            color: white;
+        }
+        .btn-green:hover {
+            box-shadow: 0 6px 20px rgba(16,185,129,0.35);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* ── How It Works Steps ── */
+        .step-card {
+            text-align: center;
+            padding: 28px 20px;
+        }
+        .step-num {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #1E3A5F, #2563EB);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0 auto 16px;
+        }
+        .step-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0F2044;
+            margin-bottom: 8px;
+        }
+        .step-desc {
+            font-size: 13px;
+            color: #64748B;
+            line-height: 1.6;
+        }
+
+        /* ── Why Us Section ── */
+        .why-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            border: 1px solid #E2E8F0;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .why-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        .why-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0F2044;
+            margin-bottom: 4px;
+        }
+        .why-desc {
+            font-size: 13px;
+            color: #64748B;
+            line-height: 1.6;
+        }
+
+        /* ── CTA Banner ── */
+        .cta-banner {
+            background: linear-gradient(135deg, #0F2044 0%, #1a56db 100%);
+            border-radius: 20px;
+            padding: 48px 40px;
+            text-align: center;
+            color: white;
+        }
+        .cta-banner h2 {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        .cta-banner p {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 28px;
+        }
+
+        /* ── Disclaimer ── */
+        .disclaimer-bar {
+            background: #FFFBEB;
+            border-top: 1px solid #FDE68A;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 13px;
+            color: #78350F;
+        }
+
+        /* ── Footer ── */
+        footer {
+            background: #0F2044;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            padding: 28px;
+            font-size: 13px;
+        }
+        footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+        footer a:hover { color: white; }
+    </style>
+</head>
+<body>
+
+<!-- ── Navbar ────────────────────────────────────────────── -->
+<nav class="navbar">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" href="home.html">❤️ CardioPredict AI</a>
+        <div class="d-flex align-items-center gap-2">
+            <!-- Guest Nav -->
+            <div id="guestNav" class="d-flex gap-2">
+                <a href="login.html" class="nav-btn nav-btn-outline">Log In</a>
+                <a href="login.html" class="nav-btn nav-btn-solid">Sign Up</a>
+            </div>
+            <!-- User Nav -->
+            <div id="userNav" style="display:none;" class="d-flex align-items-center">
+                <span class="nav-user" id="navUsername"></span>
+                <button class="nav-logout" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────── -->
+<div class="hero">
+    <div class="container">
+        <div class="hero-badge">❤️ BCA Final Year Project — AI in Healthcare</div>
+        <h1>Your Intelligent<br><span>Cardiovascular</span><br>Health Companion</h1>
+        <p>Assess your heart disease risk, check symptom urgency and get personalised health advice — all in one place.</p>
+        <a href="index.html" class="hero-cta">🔍 Start Your Assessment</a>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="num">68,517</div>
+                <div class="lbl">Patients Trained On</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">80.6%</div>
+                <div class="lbl">Model AUC Score</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">3</div>
+                <div class="lbl">ML Models Compared</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">3</div>
+                <div class="lbl">Core Modules</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Modules Section ───────────────────────────────────── -->
+<div class="container" style="padding: 64px 12px;">
+    <div class="section-title">What Can CardioPredict AI Do?</div>
+    <div class="section-sub">Three powerful tools to help you understand and manage your cardiovascular health</div>
+
+    <div class="row g-4">
+
+        <!-- Module 1 -->
+        <div class="col-lg-4">
+            <div class="module-card">
+                <div class="module-icon">🫀</div>
+                <span class="module-tag tag-blue">Module 1</span>
+                <div class="module-title">Risk Assessment</div>
+                <div class="module-desc">
+                    Enter your health metrics and get an AI-powered cardiovascular disease risk score — with a full explanation of what's driving your result.
+                </div>
+                <ul class="module-features">
+                    <li>Trained on 68,517 real patient records</li>
+                    <li>XGBoost ML model — 80.6% AUC score</li>
+                    <li>Shows which factors affect your risk most</li>
+                    <li>Saves history for logged-in users</li>
+                </ul>
+                <a href="index.html" class="btn-module btn-blue">Start Assessment →</a>
+            </div>
+        </div>
+
+        <!-- Module 2 -->
+        <div class="col-lg-4">
+            <div class="module-card">
+                <div class="module-icon">🚨</div>
+                <span class="module-tag tag-red">Module 2</span>
+                <div class="module-title">Symptom Triage</div>
+                <div class="module-desc">
+                    Experiencing symptoms right now? Find out whether you need emergency care, an urgent visit or a routine appointment — instantly.
+                </div>
+                <ul class="module-features">
+                    <li>3-level urgency classification</li>
+                    <li>Emergency, Urgent or Non-Urgent</li>
+                    <li>Clear action steps for each level</li>
+                    <li>Vitals-aware assessment</li>
+                </ul>
+                <a href="triage.html" class="btn-module btn-red">Check Symptoms →</a>
+            </div>
+        </div>
+
+        <!-- Module 3 -->
+        <div class="col-lg-4">
+            <div class="module-card">
+                <div class="module-icon">💊</div>
+                <span class="module-tag tag-green">Module 3</span>
+                <div class="module-title">Health Advice</div>
+                <div class="module-desc">
+                    Get personalised diet, exercise and lifestyle recommendations based on your specific risk factors — not generic one-size-fits-all tips.
+                </div>
+                <ul class="module-features">
+                    <li>Tailored to your specific risk factors</li>
+                    <li>Diet, exercise, lifestyle & monitoring</li>
+                    <li>Priority actions ranked by impact</li>
+                    <li>Requires risk assessment first</li>
+                </ul>
+                <a href="recommendations.html" class="btn-module btn-green">Get Advice →</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── How It Works ──────────────────────────────────────── -->
+<div style="background: white; padding: 64px 0;">
+    <div class="container">
+        <div class="section-title">How It Works</div>
+        <div class="section-sub">Get your cardiovascular risk assessment in four simple steps</div>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <div class="step-title">Enter Your Details</div>
+                    <div class="step-desc">Fill in your health metrics — age, blood pressure, cholesterol, weight and lifestyle habits.</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <div class="step-title">AI Analyses Your Data</div>
+                    <div class="step-desc">Our XGBoost model — trained on 68,517 patients — calculates your cardiovascular risk probability.</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <div class="step-title">Get Your Risk Score</div>
+                    <div class="step-desc">Receive a clear percentage score with a colour-coded risk level and explanation of key factors.</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-num">4</div>
+                    <div class="step-title">Take Action</div>
+                    <div class="step-desc">Review your personalised recommendations and track your progress over time.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Why CardioPredict ──────────────────────────────────── -->
+<div class="container" style="padding: 64px 12px;">
+    <div class="section-title">Why CardioPredict AI?</div>
+    <div class="section-sub">Built differently from generic health tools</div>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="why-card">
+                <div class="why-icon">🤖</div>
+                <div>
+                    <div class="why-title">Machine Learning Powered</div>
+                    <div class="why-desc">Not a simple calculator — a real XGBoost model trained on thousands of patient records to detect complex risk patterns.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="why-card">
+                <div class="why-icon">🔍</div>
+                <div>
+                    <div class="why-title">Explainable Results</div>
+                    <div class="why-desc">We use SHAP technology to show you exactly which factors are driving your risk score — not just a number.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="why-card">
+                <div class="why-icon">🧩</div>
+                <div>
+                    <div class="why-title">All-in-One Platform</div>
+                    <div class="why-desc">Risk assessment, symptom triage and personalised advice — all connected in one system, not scattered across different apps.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="why-card">
+                <div class="why-icon">👤</div>
+                <div>
+                    <div class="why-title">Designed for Everyone</div>
+                    <div class="why-desc">Plain language, helpful tips and guided inputs — no medical knowledge required to use CardioPredict AI.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="why-card">
+                <div class="why-icon">📊</div>
+                <div>
+                    <div class="why-title">Track Your Progress</div>
+                    <div class="why-desc">Create an account to save your assessments and monitor your cardiovascular risk over time as you make lifestyle changes.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="why-card">
+                <div class="why-icon">🎯</div>
+                <div>
+                    <div class="why-title">Personalised Advice</div>
+                    <div class="why-desc">Recommendations are tailored to your specific risk factors — not generic tips that apply to everyone equally.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── CTA Banner ────────────────────────────────────────── -->
+<div class="container" style="padding: 0 12px 64px;">
+    <div class="cta-banner">
+        <h2>Ready to Check Your Heart Health?</h2>
+        <p>It takes less than 3 minutes. No medical knowledge required.</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="index.html" style="background:white; color:#0F2044; font-weight:700;
+            padding:13px 32px; border-radius:10px; text-decoration:none; font-size:15px;
+            transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.transform='translateY(0)'">
+                🔍 Start Risk Assessment
+            </a>
+            <a href="triage.html" style="background:rgba(255,255,255,0.15);
+            border: 1.5px solid rgba(255,255,255,0.4);
+            color:white; font-weight:600; padding:13px 32px; border-radius:10px;
+            text-decoration:none; font-size:15px;">
+                🚨 Check Symptoms
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ── Disclaimer ────────────────────────────────────────── -->
+<div class="disclaimer-bar">
+    ⚠️ CardioPredict AI is for educational purposes only and is not a substitute for professional medical advice.
+    Always consult a qualified healthcare professional for medical decisions.
+</div>
+
+<!-- ── Footer ────────────────────────────────────────────── -->
+<footer>
+    <p style="font-weight:600; color:rgba(255,255,255,0.8); margin-bottom:8px;">❤️ CardioPredict AI</p>
+    <p>BCA Final Year Project &nbsp;|&nbsp; Academic Year 2025–2026 &nbsp;|&nbsp; For Educational Purposes Only</p>
+    <p style="margin-top:10px;">
+        <a href="index.html">Risk Assessment</a> &nbsp;·&nbsp;
+        <a href="triage.html">Symptom Triage</a> &nbsp;·&nbsp;
+        <a href="login.html">Login / Register</a>
+    </p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── Auth Check ───────────────────────────────────────────
+    function checkAuth() {
+        const user = localStorage.getItem('user');
+        if (user) {
+            const userData = JSON.parse(user);
+            document.getElementById('guestNav').style.display = 'none';
+            document.getElementById('userNav').style.display = 'flex';
+            document.getElementById('navUsername').textContent = '👤 ' + userData.name;
+        }
+    }
+
+    async function handleLogout() {
+        try {
+            await fetch('http://127.0.0.1:5000/api/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch(e) {}
+        localStorage.removeItem('user');
+        window.location.reload();
+    }
+
+    checkAuth();
+</script>
+
+</body>
+</html>
