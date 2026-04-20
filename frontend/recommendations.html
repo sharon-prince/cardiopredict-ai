@@ -19,7 +19,11 @@
 
         /* ── Hero ── */
         .hero {
-            background: linear-gradient(135deg, #065F46 0%, #10B981 100%);
+             background:
+        linear-gradient(135deg,
+            rgba(6,95,70,0.30) 0%,
+            rgba(217,119,6,0.47) 100%),
+        url('rec_img.png') center/cover no-repeat;
             color: white;
             padding: 44px 0 32px;
             text-align: center;
@@ -284,6 +288,8 @@
             </div>
 
             <!-- Main Content -->
+             <!-- Progress Comparison (shown only for logged-in users with 2+ assessments) -->
+<div id="progressBox" style="display:none;"></div>
             <div id="mainContent" style="display:none;">
 
                 <!-- 1. Risk Score Card -->
@@ -502,6 +508,81 @@
         document.getElementById('scoreNote').textContent = noteText;
         setTimeout(() => { bar.style.width = result.risk_score + '%'; }, 100);
 
+        // Show progress comparison if history exists
+async function showProgress(currentScore, currentLevel) {
+    const user = localStorage.getItem('user');
+    if (!user) return;
+
+    try {
+        const userId = JSON.parse(user).id;
+        const res = await fetch(
+            `http://127.0.0.1:5000/api/history?user_id=${userId}`
+        );
+        const hist = await res.json();
+
+        // Need at least 2 assessments to compare
+        if (!hist.history || hist.history.length < 2) return;
+
+        const previous = hist.history[1]; // Second most recent
+        const diff = parseFloat(
+            (previous.risk_score - currentScore).toFixed(1)
+        );
+
+        const improved = diff > 0;
+        const same = diff === 0;
+
+        const arrow = same ? '→' : improved ? '↓' : '↑';
+        const label = same
+            ? 'No change from last assessment'
+            : improved
+            ? `Improved by ${Math.abs(diff)} points ✅`
+            : `Increased by ${Math.abs(diff)} points ⚠️`;
+        const color = same
+            ? '#64748B'
+            : improved ? '#059669' : '#DC2626';
+        const bg = same
+            ? '#F8FAFC'
+            : improved ? '#F0FFF4' : '#FEF2F2';
+        const border = same
+            ? '#E2E8F0'
+            : improved ? '#10B981' : '#EF4444';
+
+        document.getElementById('progressBox').innerHTML = `
+            <div style="background:${bg}; border:1.5px solid ${border};
+            border-radius:12px; padding:16px 20px; margin-bottom:24px;
+            display:flex; align-items:center; justify-content:space-between;
+            flex-wrap:wrap; gap:12px;">
+                <div style="font-size:13px; font-weight:700;
+                color:#1E293B;">📈 Since Your Last Assessment</div>
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <div style="text-align:center;">
+                        <div style="font-size:11px; color:#64748B;">Previous</div>
+                        <div style="font-size:22px; font-weight:800;
+                        color:#64748B;">${previous.risk_score}%</div>
+                        <div style="font-size:11px; color:#64748B;">
+                        ${previous.risk_level}</div>
+                    </div>
+                    <div style="font-size:28px; color:${color};
+                    font-weight:800;">${arrow}</div>
+                    <div style="text-align:center;">
+                        <div style="font-size:11px; color:#1E293B;">Current</div>
+                        <div style="font-size:22px; font-weight:800;
+                        color:${color};">${currentScore}%</div>
+                        <div style="font-size:11px; color:#1E293B;">
+                        ${currentLevel}</div>
+                    </div>
+                </div>
+                <div style="font-size:14px; font-weight:600;
+                color:${color};">${label}</div>
+            </div>
+        `;
+        document.getElementById('progressBox').style.display = 'block';
+
+    } catch(e) {
+        console.log('Progress check failed:', e);
+    }
+}
+
         // Risk Factor Tags
         document.getElementById('factorTags').innerHTML =
             buildFactorTags(inputData);
@@ -546,6 +627,7 @@
 
         // Auto-open diet tab
         showCategory('diet');
+        showProgress(result.risk_score, result.risk_level);
     }
 
     // ── Load Recommendations ─────────────────────────────────

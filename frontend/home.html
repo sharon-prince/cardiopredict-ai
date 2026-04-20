@@ -72,7 +72,11 @@
 
         /* ── Hero ── */
         .hero {
-            background: linear-gradient(135deg, #0F2044 0%, #1a56db 60%, #2563EB 100%);
+           background: 
+        linear-gradient(135deg, 
+            rgba(15, 32, 68, 0.40) 0%, 
+            rgba(26, 86, 219, 0.70) 150%),
+        url('banner_img.png') center/cover no-repeat;
             color: white;
             padding: 80px 0 60px;
             text-align: center;
@@ -648,15 +652,16 @@
     }
 
     async function handleLogout() {
-        try {
-            await fetch('http://127.0.0.1:5000/api/logout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-        } catch(e) {}
-        localStorage.removeItem('user');
-        window.location.reload();
-    }
+    try {
+        await fetch('http://127.0.0.1:5000/api/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+    } catch(e) {}
+    localStorage.removeItem('user');
+    localStorage.removeItem('lastPrediction');  
+    window.location.reload();
+}
 
     checkAuth();
 </script>
