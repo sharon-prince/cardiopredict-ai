@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Symptom Triage — CardioPredict AI</title>
+    <title>Symptom Checker — CardioPredict AI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { font-family: 'Inter', sans-serif; }
         body { background-color: #F1F5F9; }
@@ -14,71 +14,155 @@
             background: linear-gradient(90deg, #0F2044, #1a3a6e);
             padding: 14px 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            
         }
-        .navbar-brand { font-size: 22px; font-weight: 700; }
+        .navbar-brand {
+            font-size: 22px;
+            font-weight: 700;
+            color: white !important;
+            text-decoration: none;
+        }
 
         .hero {
-    background:
-       
+            background:
+        linear-gradient(135deg,
+            rgba(214, 18, 18, 0.3) 0%,
+            rgba(217,119,6,0.47) 100%),
         url('triage_img.png') center/cover no-repeat;
-            color: rgb(0, 0, 0);
-            padding: 80px 0 50px;
+            color: white;
+            padding: 44px 0 32px;
             text-align: center;
         }
-        .hero h1 { font-size: 34px; font-weight: 700; }
-        .hero p { font-size: 16px; opacity: 0.85; max-width: 500px; margin: 10px auto 0; }
+        .hero h1 { font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+        .hero p { font-size: 15px; opacity: 0.85; margin: 0; }
 
-        .emergency-banner {
-            background: hsla(0, 52%, 48%, 0.783);
+        /* Emergency Strip */
+        .emergency-strip {
+            background: #DC2626;
             color: white;
             text-align: center;
-            padding: 12px;
+            padding: 10px 16px;
+            font-size: 14px;
             font-weight: 600;
-            font-size: 15px;
         }
-
-        .main-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            overflow: hidden;
-            margin-bottom: 24px;
-        }
-        .section-header {
-            background: linear-gradient(90deg, #0F2044, #1a3a6e);
+        .emergency-strip a {
             color: white;
-            padding: 14px 24px;
-            font-weight: 600;
-            font-size: 15px;
+            text-decoration: underline;
         }
-        .section-body { padding: 24px; }
 
-        .symptom-check {
+        /* Symptom Tap Buttons */
+        .symptom-btn {
             display: flex;
-            align-items: flex-start;
-            padding: 14px;
-            border: 1.5px solid #E2E8F0;
-            border-radius: 10px;
-            margin-bottom: 12px;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            padding: 16px 20px;
+            background: white;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        /* Two column symptom grid */
+.symptom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+@media (max-width: 576px) {
+    .symptom-grid { grid-template-columns: 1fr; }
+}
+.symptom-btn {
+    margin-bottom: 0;
+}
+/* Severity row inline */
+.severity-quick {
+    grid-column: 1 / -1;
+}
+        .symptom-btn:hover {
+            border-color: #0D9488;
+            background: #F0FDFA;
+            transform: translateX(3px);
+        }
+        .symptom-btn.selected {
+            border-color: #0D9488;
+            background: #F0FDFA;
+            box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+        }
+        .symptom-btn.selected-red {
+            border-color: #DC2626;
+            background: #FEF2F2;
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+        }
+        .symptom-icon { font-size: 28px; flex-shrink: 0; }
+        .symptom-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1E293B;
+        }
+        .symptom-hint {
+            font-size: 12px;
+            color: #64748B;
+            margin-top: 2px;
+        }
+        .symptom-check-icon {
+            margin-left: auto;
+            font-size: 20px;
+            display: none;
+        }
+        .symptom-btn.selected .symptom-check-icon,
+        .symptom-btn.selected-red .symptom-check-icon {
+            display: block;
+        }
+
+        /* Severity Quick Select */
+        .severity-quick {
+            display: none;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .severity-quick.show { display: flex; }
+        .sev-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid #E2E8F0;
+            background: white;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .symptom-check:hover { border-color: #1a56db; background: #EFF6FF; }
-        .symptom-check.selected { border-color: #DC2626; background: #FEF2F2; }
-        .symptom-check input[type="checkbox"] {
-            width: 20px; height: 20px;
-            margin-right: 14px;
-            margin-top: 2px;
+        .sev-btn:hover { border-color: #0D9488; }
+        .sev-btn.active-mild { background: #D1FAE5; border-color: #10B981; color: #059669; }
+        .sev-btn.active-moderate { background: #FEF3C7; border-color: #F59E0B; color: #D97706; }
+        .sev-btn.active-severe { background: #FEE2E2; border-color: #EF4444; color: #DC2626; }
+
+        /* Optional Details Toggle */
+        .optional-toggle {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 12px 16px;
             cursor: pointer;
-            accent-color: #DC2626;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748B;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
         }
-        .symptom-label { font-weight: 600; font-size: 14px; color: #1E293B; }
-        .symptom-hint { font-size: 12px; color: #94A3B8; margin-top: 3px; }
+        .optional-toggle:hover { background: #EFF6FF; color: #2563EB; }
+        .optional-details {
+            display: none;
+            padding: 16px 0 8px;
+        }
+        .optional-details.show { display: block; }
 
-        .severity-slider { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #E2E8F0; }
-        .form-range::-webkit-slider-thumb { background: #DC2626; }
-
-        .form-label { font-weight: 600; font-size: 13.5px; color: #1E293B; }
+        .form-label { font-weight: 600; font-size: 13px; color: #1E293B; }
         .form-control, .form-select {
             border: 1.5px solid #CBD5E1;
             border-radius: 8px;
@@ -86,73 +170,44 @@
             font-size: 14px;
         }
         .form-control:focus, .form-select:focus {
-            border-color: #DC2626;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+            border-color: #0D9488;
+            box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
         }
 
-        .btn-triage {
-            background: linear-gradient(135deg, #DC2626, #7F1D1D);
+        /* Assess Button */
+        .btn-assess {
+            background: linear-gradient(135deg, #0F2044, #0D9488);
             color: white;
             border: none;
-            border-radius: 10px;
-            padding: 14px;
+            border-radius: 12px;
+            padding: 16px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             width: 100%;
             transition: all 0.3s;
+            margin-top: 8px;
         }
-        .btn-triage:hover {
+        .btn-assess:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(220,38,38,0.35);
+            box-shadow: 0 6px 20px rgba(13,148,136,0.35);
             color: white;
         }
 
-        /* Result Cards */
-        .result-card { display: none; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); margin-top: 28px; }
-        .result-emergency .result-top { background: linear-gradient(135deg, #7F1D1D, #DC2626); }
-        .result-urgent .result-top { background: linear-gradient(135deg, #92400E, #F59E0B); }
-        .result-nonurgent .result-top { background: linear-gradient(135deg, #065F46, #10B981); }
-
-        .result-top { padding: 30px; text-align: center; color: white; }
-        .result-level { font-size: 42px; font-weight: 800; }
-        .result-action { font-size: 16px; margin-top: 8px; opacity: 0.9; }
-        .result-wait { font-size: 13px; margin-top: 6px; opacity: 0.75; }
-
-        .result-body { background: white; padding: 24px; }
-        .reason-tag {
-            display: inline-block;
-            background: #FEF2F2;
-            color: #DC2626;
-            border: 1px solid #FECACA;
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 13px;
-            margin: 4px;
-            font-weight: 500;
+        .main-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+            overflow: hidden;
+            margin-bottom: 20px;
         }
-        .advice-item {
-            display: flex;
-            align-items: flex-start;
-            padding: 10px 0;
-            border-bottom: 1px solid #E2E8F0;
-            font-size: 14px;
-            color: #374151;
-        }
-        .advice-item:last-child { border-bottom: none; }
-        .advice-num {
-            background: #1E3A5F;
+        .card-header-bar {
+            background: linear-gradient(90deg, #0F2044, #1a3a6e);
             color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            margin-right: 12px;
-            flex-shrink: 0;
+            padding: 14px 24px;
+            font-weight: 600;
+            font-size: 15px;
         }
+        .card-body-pad { padding: 20px 24px; }
 
         .disclaimer {
             background: #FFFBEB;
@@ -161,7 +216,15 @@
             padding: 12px 16px;
             font-size: 13px;
             color: #78350F;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #0D9488;
+            font-weight: 500;
         }
 
         footer {
@@ -172,371 +235,774 @@
             font-size: 13px;
             margin-top: 60px;
         }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #DC2626;
-            font-weight: 500;
-        }
     </style>
 </head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-dark">
-    <div class="container d-flex justify-content-between align-items-center">
-        <a href="home.html" style="text-decoration:none;" class="navbar-brand">❤️ CardioPredict AI</a>
-        <a href="index.html" style="color:white; font-size:14px;
-        text-decoration:none; background:rgba(255,255,255,0.15);
-        padding:6px 16px; border-radius:20px;">
-            ← Back to Home
-        </a>
+<!-- ── Navbar ── -->
+<nav style="background:linear-gradient(90deg,#0F2044,#1a3a6e);
+padding:0; box-shadow:0 2px 12px rgba(0,0,0,0.2);
+position:sticky; top:0; z-index:999;">
+    <div class="container">
+        <div style="display:flex; align-items:center;
+        justify-content:space-between; padding:12px 0; gap:12px;">
+
+            <!-- Brand -->
+            <a href="home.html"
+            style="font-size:20px; font-weight:800; color:white;
+            text-decoration:none; letter-spacing:0.3px; flex-shrink:0;">
+                ❤️ CardioPredict AI
+            </a>
+
+            <!-- Module Links (hidden on mobile, shown on desktop) -->
+            <div class="d-none d-md-flex align-items-center"
+            style="gap:4px;">
+                <a href="index.html" id="nav-risk"
+                style="color:rgba(255,255,255,0.8); text-decoration:none;
+                padding:7px 14px; border-radius:20px; font-size:14px;
+                font-weight:500; transition:all 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.12)';
+                this.style.color='white'"
+                onmouseout="this.style.background='transparent';
+                this.style.color='rgba(255,255,255,0.8)'">
+                    📊 Risk Assessment
+                </a>
+                <a href="triage.html" id="nav-triage"
+                style="color:rgba(255,255,255,0.8); text-decoration:none;
+                padding:7px 14px; border-radius:20px; font-size:14px;
+                font-weight:500; transition:all 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.12)';
+                this.style.color='white'"
+                onmouseout="this.style.background='transparent';
+                this.style.color='rgba(255,255,255,0.8)'">
+                    🩺 Symptoms
+                </a>
+                <a href="recommendations.html" id="nav-rec"
+                style="color:rgba(255,255,255,0.8); text-decoration:none;
+                padding:7px 14px; border-radius:20px; font-size:14px;
+                font-weight:500; transition:all 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.12)';
+                this.style.color='white'"
+                onmouseout="this.style.background='transparent';
+                this.style.color='rgba(255,255,255,0.8)'">
+                    💊 Health Advice
+                </a>
+            </div>
+
+            <!-- Auth -->
+            <div style="display:flex; align-items:center; gap:8px;
+            flex-shrink:0;">
+                <!-- Guest -->
+                <div id="guestNav" class="d-flex gap-2">
+                    <a href="login.html"
+                    style="color:white; font-size:13px;
+                    text-decoration:none;
+                    border:1.5px solid rgba(255,255,255,0.4);
+                    padding:6px 14px; border-radius:20px;
+                    transition:all 0.2s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.1)'"
+                    onmouseout="this.style.background='transparent'">
+                        Log In
+                    </a>
+                    <a href="login.html"
+                    style="color:#0F2044; font-size:13px;
+                    text-decoration:none; background:white;
+                    padding:6px 14px; border-radius:20px;
+                    font-weight:600; transition:all 0.2s;"
+                    onmouseover="this.style.background='#E0E7FF'"
+                    onmouseout="this.style.background='white'">
+                        Sign Up
+                    </a>
+                </div>
+                <!-- User -->
+                <div id="userNav" style="display:none;
+                align-items:center; gap:8px;">
+                    <span id="navUsername"
+                    style="color:white; font-size:13px;
+                    font-weight:500;"></span>
+                    <button onclick="handleLogout()"
+                    style="color:white; font-size:12px;
+                    background:rgba(255,255,255,0.12);
+                    border:none; padding:6px 14px;
+                    border-radius:20px; cursor:pointer;
+                    transition:all 0.2s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.22)'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+                        Logout
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="d-md-none"
+                onclick="toggleMobileMenu()"
+                style="background:rgba(255,255,255,0.12);
+                border:none; color:white; padding:6px 12px;
+                border-radius:8px; font-size:18px; cursor:pointer;">
+                    ☰
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobileMenu" style="display:none;
+        border-top:1px solid rgba(255,255,255,0.1);
+        padding:12px 0;">
+            <a href="index.html"
+            style="display:block; color:rgba(255,255,255,0.85);
+            text-decoration:none; padding:10px 4px; font-size:15px;
+            font-weight:500;">
+                📊 Risk Assessment
+            </a>
+            <a href="triage.html"
+            style="display:block; color:rgba(255,255,255,0.85);
+            text-decoration:none; padding:10px 4px; font-size:15px;
+            font-weight:500;">
+                🩺 Symptom Checker
+            </a>
+            <a href="recommendations.html"
+            style="display:block; color:rgba(255,255,255,0.85);
+            text-decoration:none; padding:10px 4px; font-size:15px;
+            font-weight:500;">
+                💊 Health Advice
+            </a>
+        </div>
     </div>
 </nav>
-
-<!-- Emergency Banner -->
-<div class="emergency-banner">
-    🚨 If you are experiencing severe chest pain or difficulty breathing — Call 911 immediately
+<!-- Emergency Strip -->
+<div class="emergency-strip">
+    🚨 Severe chest pain or difficulty breathing?
+    <a href="tel:112">Call 112</a> or
+    <a href="tel:108">108 immediately</a>
+    — don't wait, don't fill forms
 </div>
 
 <!-- Hero -->
 <div class="hero">
     <div class="container">
-        <h1>🩺 Urgent Symptom Checker</h1>
-        <p>Tell us what you're experiencing and we'll help you decide how urgently you need care</p>
+        <h1>🩺 Symptom Checker</h1>
+        <p>Select what you are experiencing — get instant guidance on what to do</p>
     </div>
 </div>
 
 <!-- Main Content -->
-<div class="container my-5">
+<div class="container my-4">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-lg-7">
 
-            <!-- Disclaimer -->
             <div class="disclaimer">
-                ⚠️ <strong>Important:</strong> This tool helps assess urgency but is NOT a substitute
-                for professional medical judgment. When in doubt, always seek immediate care.
+                ⚠️ This is a guidance tool only — not a medical diagnosis.
+                When in doubt, always call emergency services immediately.
             </div>
 
-            <!-- Symptoms Card -->
+            <!-- Step 1: Select Symptoms -->
             <div class="main-card">
-                <div class="section-header">🫀 Chest & Heart Symptoms</div>
-                <div class="section-body">
-
-                    <!-- Chest Pain -->
-                    <div class="symptom-check" id="chestPainBox" onclick="toggleSymptom('chest_pain', 'chestPainBox', 'chestPainSlider')">
-                        <input type="checkbox" id="chest_pain">
-                        <div>
-                            <div class="symptom-label">Chest Pain or Discomfort</div>
-                            <div class="symptom-hint">Pressure, tightness, squeezing or burning in the chest</div>
-                            <div class="severity-slider" id="chestPainSlider">
-                                <label class="form-label">Severity: <span id="chestPainVal">5</span>/10</label>
-                                <input type="range" class="form-range" id="chest_pain_severity"
-                                       min="1" max="10" value="5"
-                                       oninput="document.getElementById('chestPainVal').textContent = this.value">
-                                <div style="font-size:12px; color:#94A3B8; margin-top:6px;">
-                                    Does the pain spread to your arm, jaw or back?
-                                    <input type="checkbox" id="radiating_pain" style="margin-left:8px; accent-color:#DC2626;">
-                                    <label for="radiating_pain" style="font-size:12px; margin-left:4px;">Yes</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Palpitations -->
-                    <div class="symptom-check" id="palpBox" onclick="toggleSymptom('palpitations', 'palpBox', null)">
-                        <input type="checkbox" id="palpitations">
-                        <div>
-                            <div class="symptom-label">Rapid or Irregular Heartbeat</div>
-                            <div class="symptom-hint">Palpitations, fluttering or pounding sensation in chest</div>
-                        </div>
-                    </div>
-
+                <div class="card-header-bar">
+                    Step 1 — What are you experiencing?
+                    <span style="font-size:12px; opacity:0.75; margin-left:8px;">
+                    Select all that apply</span>
                 </div>
+                <div class="card-body-pad">
+<div class="symptom-grid">
+
+    <!-- Chest Pain -->
+    <button class="symptom-btn" id="btn-chest"
+            onclick="toggleSymptom('chest')">
+        <span class="symptom-icon">💔</span>
+        <div>
+            <div class="symptom-name">Chest Pain</div>
+            <div class="symptom-hint">
+            Pressure, tightness or burning</div>
+        </div>
+        <span class="symptom-check-icon">✅</span>
+    </button>
+
+    <!-- Shortness of Breath -->
+    <button class="symptom-btn" id="btn-breath"
+            onclick="toggleSymptom('breath')">
+        <span class="symptom-icon">😮‍💨</span>
+        <div>
+            <div class="symptom-name">Shortness of Breath</div>
+            <div class="symptom-hint">
+            Difficulty breathing</div>
+        </div>
+        <span class="symptom-check-icon">✅</span>
+    </button>
+
+    <!-- Severity for Chest — spans full width -->
+    <div class="severity-quick" id="sev-chest">
+        <span style="font-size:13px; font-weight:600;
+        color:#64748B; align-self:center;">
+        Chest pain — how bad?</span>
+        <button class="sev-btn"
+            onclick="setSeverity('chest','mild')">Mild</button>
+        <button class="sev-btn"
+            onclick="setSeverity('chest','moderate')">
+            Moderate</button>
+        <button class="sev-btn"
+            onclick="setSeverity('chest','severe')">
+            Severe 🔴</button>
+        <div style="width:100%; margin-top:6px;">
+            <label style="font-size:12px;
+            color:#64748B; cursor:pointer;">
+                <input type="checkbox" id="radiating"
+                style="accent-color:#DC2626; margin-right:6px;">
+                Spreads to arm, jaw or back
+            </label>
+        </div>
+    </div>
+
+    <!-- Severity for Breath — spans full width -->
+    <div class="severity-quick" id="sev-breath">
+        <span style="font-size:13px; font-weight:600;
+        color:#64748B; align-self:center;">
+        Breathlessness — how bad?</span>
+        <button class="sev-btn"
+            onclick="setSeverity('breath','mild')">Mild</button>
+        <button class="sev-btn"
+            onclick="setSeverity('breath','moderate')">
+            Moderate</button>
+        <button class="sev-btn"
+            onclick="setSeverity('breath','severe')">
+            Severe 🔴</button>
+    </div>
+
+    <!-- Palpitations -->
+    <button class="symptom-btn" id="btn-palp"
+            onclick="toggleSymptom('palp')">
+        <span class="symptom-icon">💓</span>
+        <div>
+            <div class="symptom-name">Palpitations</div>
+            <div class="symptom-hint">
+            Racing or irregular heartbeat</div>
+        </div>
+        <span class="symptom-check-icon">✅</span>
+    </button>
+
+    <!-- Dizziness -->
+    <button class="symptom-btn" id="btn-dizzy"
+            onclick="toggleSymptom('dizzy')">
+        <span class="symptom-icon">🌀</span>
+        <div>
+            <div class="symptom-name">Dizziness</div>
+            <div class="symptom-hint">
+            Feeling faint or unsteady</div>
+        </div>
+        <span class="symptom-check-icon">✅</span>
+    </button>
+
+    <!-- Fainting -->
+    <button class="symptom-btn" id="btn-faint"
+            onclick="toggleSymptom('faint')">
+        <span class="symptom-icon">😵</span>
+        <div>
+            <div class="symptom-name">Fainting</div>
+            <div class="symptom-hint"
+            style="color:#DC2626; font-weight:600;">
+            ⚠️ Always Emergency</div>
+        </div>
+        <span class="symptom-check-icon">✅</span>
+    </button>
+
+    <!-- Sweating -->
+    <button class="symptom-btn" id="btn-sweat"
+            onclick="toggleSymptom('sweat')">
+        <span class="symptom-icon">💧</span>
+        <div>
+            <div class="symptom-name">Unusual Sweating</div>
+            <div class="symptom-hint">
+            Cold sweats not from heat</div>
+        </div>
+        <span class="symptom-check-icon">✅</span>
+    </button>
+
+    <!-- Nausea -->
+    <button class="symptom-btn" id="btn-nausea"
+            onclick="toggleSymptom('nausea')">
+        <span class="symptom-icon">🤢</span>
+        <div>
+            <div class="symptom-name">Nausea</div>
+            <div class="symptom-hint">
+            Feeling sick or vomiting</div>
+        </div>
+        <span class="symptom-check-icon">✅</span>
+    </button>
+
+    <!-- Fatigue -->
+    <button class="symptom-btn" id="btn-fatigue"
+            onclick="toggleSymptom('fatigue')">
+        <span class="symptom-icon">😴</span>
+        <div>
+            <div class="symptom-name">Extreme Fatigue</div>
+            <div class="symptom-hint">
+            Unusual tiredness</div>
+        </div>
+        <span class="symptom-check-icon">✅</span>
+    </button>
+
+</div>
+</div>
             </div>
 
-            <!-- Breathing Card -->
+            <!-- Optional Details (collapsed by default) -->
             <div class="main-card">
-                <div class="section-header">🫁 Breathing & Circulation</div>
-                <div class="section-body">
-
-                    <!-- Shortness of Breath -->
-                    <div class="symptom-check" id="breathBox" onclick="toggleSymptom('shortness_of_breath', 'breathBox', 'breathSlider')">
-                        <input type="checkbox" id="shortness_of_breath">
-                        <div>
-                            <div class="symptom-label">Shortness of Breath</div>
-                            <div class="symptom-hint">Difficulty breathing, feeling breathless</div>
-                            <div class="severity-slider" id="breathSlider">
-                                <label class="form-label">How severe?</label>
-                                <select class="form-select form-select-sm" id="breath_severity" style="max-width:200px;">
-                                    <option value="mild">Mild — slightly breathless</option>
-                                    <option value="moderate">Moderate — noticeable difficulty</option>
-                                    <option value="severe">Severe — cannot catch breath</option>
+                <div class="card-body-pad">
+                    <div class="optional-toggle"
+                         onclick="toggleOptional()">
+                        <span>➕ Add vitals for more accurate result
+                        <span style="font-size:11px; margin-left:6px;
+                        font-weight:400;">(optional)</span></span>
+                        <span id="optArrow">▼</span>
+                    </div>
+                    <div class="optional-details" id="optionalDetails">
+                        <div class="row g-3 mt-1">
+                            <div class="col-6">
+                                <label class="form-label">
+                                Heart Rate (BPM)</label>
+                                <input type="number" class="form-control"
+                                id="heart_rate" placeholder="e.g. 85"
+                                min="0" max="300">
+                                <div style="font-size:11px; color:#94A3B8;
+                                margin-top:4px;">Normal: 60–100</div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">
+                                Systolic BP (mmHg)</label>
+                                <input type="number" class="form-control"
+                                id="systolic_bp" placeholder="e.g. 120"
+                                min="0" max="300">
+                                <div style="font-size:11px; color:#94A3B8;
+                                margin-top:4px;">Normal: below 120</div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">
+                                When did it start?</label>
+                                <select class="form-select"
+                                id="symptom_duration">
+                                    <option value="now">
+                                    Just now / Suddenly</option>
+                                    <option value="hours">
+                                    A few hours ago</option>
+                                    <option value="days">
+                                    A few days ago</option>
+                                    <option value="weeks">
+                                    Weeks ago</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">
+                                Previous heart condition?</label>
+                                <select class="form-select"
+                                id="cardiac_history">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
                                 </select>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Dizziness -->
-                    <div class="symptom-check" id="dizzyBox" onclick="toggleSymptom('dizziness', 'dizzyBox', null)">
-                        <input type="checkbox" id="dizziness">
-                        <div>
-                            <div class="symptom-label">Dizziness or Lightheadedness</div>
-                            <div class="symptom-hint">Feeling faint, unsteady or like the room is spinning</div>
-                        </div>
-                    </div>
-
-                    <!-- Fainting -->
-                    <div class="symptom-check" id="faintBox" onclick="toggleSymptom('fainting', 'faintBox', null)">
-                        <input type="checkbox" id="fainting">
-                        <div>
-                            <div class="symptom-label">Fainting or Loss of Consciousness</div>
-                            <div class="symptom-hint">Blacked out or nearly fainted</div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
-            <!-- Other Symptoms -->
-            <div class="main-card">
-                <div class="section-header">🌡️ Other Symptoms</div>
-                <div class="section-body">
-
-                    <div class="symptom-check" id="sweatBox" onclick="toggleSymptom('sweating', 'sweatBox', null)">
-                        <input type="checkbox" id="sweating">
-                        <div>
-                            <div class="symptom-label">Unusual Sweating</div>
-                            <div class="symptom-hint">Cold sweats not related to heat or exercise</div>
-                        </div>
-                    </div>
-
-                    <div class="symptom-check" id="nauseaBox" onclick="toggleSymptom('nausea', 'nauseaBox', null)">
-                        <input type="checkbox" id="nausea">
-                        <div>
-                            <div class="symptom-label">Nausea or Vomiting</div>
-                            <div class="symptom-hint">Feeling sick to stomach alongside other symptoms</div>
-                        </div>
-                    </div>
-
-                    <div class="symptom-check" id="fatigueBox" onclick="toggleSymptom('fatigue', 'fatigueBox', null)">
-                        <input type="checkbox" id="fatigue">
-                        <div>
-                            <div class="symptom-label">Extreme Fatigue</div>
-                            <div class="symptom-hint">Unusual tiredness or exhaustion</div>
-                        </div>
-                    </div>
-
-                </div>
+            <!-- Assess Button -->
+            <div class="loading" id="loadingMsg">
+                ⏳ Assessing your symptoms...
             </div>
+            <button class="btn-assess" onclick="assessTriage()">
+                🔍 Get Guidance Now
+            </button>
 
-            <!-- Vitals & Context -->
-            <div class="main-card">
-                <div class="section-header">📊 Vitals & Context (Optional)</div>
-                <div class="section-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Heart Rate (BPM)</label>
-                            <input type="number" class="form-control" id="heart_rate"
-                                   min="0" max="300" placeholder="e.g. 85 (leave blank if unknown)">
-                            <div style="font-size:12px; color:#94A3B8; margin-top:4px;">Normal: 60-100 BPM</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Systolic Blood Pressure</label>
-                            <input type="number" class="form-control" id="systolic_bp"
-                                   min="0" max="300" placeholder="e.g. 120 (leave blank if unknown)">
-                            <div style="font-size:12px; color:#94A3B8; margin-top:4px;">Normal: below 120 mmHg</div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">When Did Symptoms Start?</label>
-                            <select class="form-select" id="symptom_duration">
-                                <option value="now">Just now / Suddenly</option>
-                                <option value="hours">A few hours ago</option>
-                                <option value="days">A few days ago</option>
-                                <option value="weeks">Weeks ago</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Previous Heart Problems?</label>
-                            <select class="form-select" id="cardiac_history">
-                                <option value="0">No previous cardiac history</option>
-                                <option value="1">Yes — previous heart condition</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="loading" id="loadingMsg">
-                        ⏳ Assessing your symptoms...
-                    </div>
-
-                    <button class="btn-triage" onclick="assessTriage()">
-                        🔍 Assess My Urgency
-                    </button>
-                </div>
-            </div>
-
-            <!-- Result Card -->
-            <div class="result-card" id="resultCard">
-                <div class="result-top" id="resultTop">
-                    <div class="result-level" id="resultLevel"></div>
-                    <div class="result-action" id="resultAction"></div>
-                    <div class="result-wait" id="resultWait"></div>
-                </div>
-                <div class="result-body">
-                    <h6 style="font-weight:700; color:#1E293B; margin-bottom:12px;">
-                        Symptoms Detected:
-                    </h6>
-                    <div id="reasonTags"></div>
-
-                    <h6 style="font-weight:700; color:#1E293B; margin:20px 0 12px;">
-                        What To Do:
-                    </h6>
-                    <div id="adviceList"></div>
-
-                    <div class="disclaimer mt-4 mb-0">
-                        ⚠️ This assessment is for guidance only. Always trust your instincts —
-                        if something feels seriously wrong, seek immediate medical care.
-                    </div>
-                    
-                </div>
-            </div>
+            <!-- Result -->
+            <div id="resultCard" style="display:none; margin-top:24px;"></div>
 
         </div>
     </div>
 </div>
 
-<!-- Footer -->
 <footer>
-    <p>❤️ CardioPredict AI &nbsp;|&nbsp; BCA Final Year Project &nbsp;|&nbsp; For Educational Purposes Only</p>
+    <p>❤️ CardioPredict AI &nbsp;|&nbsp;
+    BCA Final Year Project &nbsp;|&nbsp;
+    For Educational Purposes Only</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function toggleSymptom(checkboxId, boxId, sliderId) {
-        const checkbox = document.getElementById(checkboxId);
-        const box = document.getElementById(boxId);
 
-        // Don't toggle if clicking inside slider
-        if (event.target.tagName === 'INPUT' && event.target.type !== 'checkbox') return;
-        if (event.target.tagName === 'SELECT') return;
-        if (event.target.tagName === 'LABEL') return;
+    // ── State ────────────────────────────────────────────────
+    const state = {
+        chest: false, breath: false, palp: false,
+        dizzy: false, faint: false, sweat: false,
+        nausea: false, fatigue: false,
+        chestSev: null, breathSev: null
+    };
 
-        if (event.target.type === 'checkbox') {
-            // Clicked directly on checkbox
+    // ── Toggle Symptom ───────────────────────────────────────
+    function toggleSymptom(id) {
+        state[id] = !state[id];
+        const btn = document.getElementById('btn-' + id);
+
+        if (id === 'faint') {
+            btn.classList.toggle('selected-red', state[id]);
         } else {
-            checkbox.checked = !checkbox.checked;
+            btn.classList.toggle('selected', state[id]);
         }
 
-        if (checkbox.checked) {
-            box.classList.add('selected');
-            if (sliderId) {
-                document.getElementById(sliderId).style.display = 'block';
-            }
-        } else {
-            box.classList.remove('selected');
-            if (sliderId) {
-                document.getElementById(sliderId).style.display = 'none';
-            }
+        // Show severity for chest and breath
+        if (id === 'chest') {
+            document.getElementById('sev-chest').classList
+                .toggle('show', state[id]);
+            if (!state[id]) state.chestSev = null;
+        }
+        if (id === 'breath') {
+            document.getElementById('sev-breath').classList
+                .toggle('show', state[id]);
+            if (!state[id]) state.breathSev = null;
+        }
+
+        // Auto-assess fainting immediately
+        if (id === 'faint' && state[id]) {
+            setTimeout(() => assessTriage(), 300);
         }
     }
 
-async function assessTriage() {
+    // ── Set Severity ─────────────────────────────────────────
+    function setSeverity(symptom, level) {
+        const key = symptom === 'chest' ? 'chestSev' : 'breathSev';
+        state[key] = level;
 
-    // Validate — at least one symptom must be selected
-    const symptoms = ['chest_pain', 'palpitations', 'shortness_of_breath',
-                      'dizziness', 'fainting', 'sweating', 'nausea', 'fatigue'];
-    const anySelected = symptoms.some(id =>
-        document.getElementById(id).checked
-    );
+        const container = document.getElementById('sev-' + symptom);
+        container.querySelectorAll('.sev-btn').forEach(btn => {
+            btn.className = 'sev-btn';
+        });
 
-    if (!anySelected) {
-        alert('⚠️ Please select at least one symptom before assessing.');
-        return;
+        const btnEl = [...container.querySelectorAll('.sev-btn')]
+            .find(b => b.textContent.toLowerCase().includes(level));
+        if (btnEl) btnEl.classList.add(`active-${level}`);
+
+        // Auto assess for severe chest pain
+        if (symptom === 'chest' && level === 'severe') {
+            setTimeout(() => assessTriage(), 400);
+        }
     }
 
-    document.getElementById('loadingMsg').style.display = 'block';
-    document.getElementById('resultCard').style.display = 'none';
+    // ── Toggle Optional ──────────────────────────────────────
+    function toggleOptional() {
+        const details = document.getElementById('optionalDetails');
+        const arrow = document.getElementById('optArrow');
+        details.classList.toggle('show');
+        arrow.textContent = details.classList.contains('show') ? '▲' : '▼';
+    }
+
+    // ── Severity Map ─────────────────────────────────────────
+    function sevToNum(sev) {
+        if (sev === 'severe') return 8;
+        if (sev === 'moderate') return 5;
+        if (sev === 'mild') return 2;
+        return 0;
+    }
+
+    function sevToString(sev) {
+        return sev || 'none';
+    }
+
+    // ── Assess Triage ────────────────────────────────────────
+    async function assessTriage() {
+        const anySelected = Object.entries(state)
+            .filter(([k]) => !['chestSev','breathSev'].includes(k))
+            .some(([, v]) => v === true);
+
+        if (!anySelected) {
+            alert('⚠️ Please select at least one symptom.');
+            return;
+        }
+
+        document.getElementById('loadingMsg').style.display = 'block';
+        document.getElementById('resultCard').style.display = 'none';
 
         const data = {
-            chest_pain: document.getElementById('chest_pain').checked ? 1 : 0,
-            chest_pain_severity: parseInt(document.getElementById('chest_pain_severity').value) || 0,
-            radiating_pain: document.getElementById('radiating_pain').checked ? 1 : 0,
-            shortness_of_breath: document.getElementById('shortness_of_breath').checked ? 1 : 0,
-            breath_severity: document.getElementById('breath_severity').value,
-            palpitations: document.getElementById('palpitations').checked ? 1 : 0,
-            dizziness: document.getElementById('dizziness').checked ? 1 : 0,
-            fainting: document.getElementById('fainting').checked ? 1 : 0,
-            sweating: document.getElementById('sweating').checked ? 1 : 0,
-            nausea: document.getElementById('nausea').checked ? 1 : 0,
-            fatigue: document.getElementById('fatigue').checked ? 1 : 0,
-            heart_rate: parseInt(document.getElementById('heart_rate').value) || 0,
-            systolic_bp: parseInt(document.getElementById('systolic_bp').value) || 0,
-            symptom_duration: document.getElementById('symptom_duration').value,
-            cardiac_history: parseInt(document.getElementById('cardiac_history').value)
+            chest_pain:          state.chest ? 1 : 0,
+            chest_pain_severity: sevToNum(state.chestSev),
+            radiating_pain:      document.getElementById('radiating')
+                                    ?.checked ? 1 : 0,
+            shortness_of_breath: state.breath ? 1 : 0,
+            breath_severity:     sevToString(state.breathSev),
+            palpitations:        state.palp ? 1 : 0,
+            dizziness:           state.dizzy ? 1 : 0,
+            fainting:            state.faint ? 1 : 0,
+            sweating:            state.sweat ? 1 : 0,
+            nausea:              state.nausea ? 1 : 0,
+            fatigue:             state.fatigue ? 1 : 0,
+            heart_rate:    parseInt(document.getElementById('heart_rate')
+                                .value) || 0,
+            systolic_bp:   parseInt(document.getElementById('systolic_bp')
+                                .value) || 0,
+            symptom_duration: document.getElementById('symptom_duration')
+                                .value,
+            cardiac_history: parseInt(
+                document.getElementById('cardiac_history').value)
         };
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/api/triage', {
+            const response = await fetch(
+                'http://127.0.0.1:5000/api/triage', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-
             const result = await response.json();
             document.getElementById('loadingMsg').style.display = 'none';
-
-            // Set result card class
-            const card = document.getElementById('resultCard');
-            card.className = 'result-card';
-            if (result.triage_level === 'Emergency') {
-                card.classList.add('result-emergency');
-            } else if (result.triage_level === 'Urgent') {
-                card.classList.add('result-urgent');
-            } else {
-                card.classList.add('result-nonurgent');
-            }
-
-            // Emoji for level
-            const emojis = {
-                'Emergency': '🚨',
-                'Urgent': '⚠️',
-                'Non-Urgent': '✅'
-            };
-
-            document.getElementById('resultLevel').textContent =
-                emojis[result.triage_level] + ' ' + result.triage_level;
-            document.getElementById('resultAction').textContent = result.action;
-            document.getElementById('resultWait').textContent =
-                '⏱️ ' + result.wait_time;
-
-            // Reasons
-            document.getElementById('reasonTags').innerHTML =
-                result.reasons.map(r =>
-                    `<span class="reason-tag">${r}</span>`
-                ).join('');
-
-            // Advice
-            document.getElementById('adviceList').innerHTML =
-                result.advice.map((a, i) => `
-                    <div class="advice-item">
-                        <div class="advice-num">${i + 1}</div>
-                        <div>${a}</div>
-                    </div>
-                `).join('');
-
-            card.style.display = 'block';
-            card.scrollIntoView({ behavior: 'smooth' });
-
-        } catch (error) {
+            renderResult(result);
+        } catch(e) {
             document.getElementById('loadingMsg').style.display = 'none';
-            alert('❌ Error connecting to API. Make sure Flask is running!');
+            alert('❌ Cannot connect to server. Is Flask running?');
         }
     }
-</script>
 
+    // ── Render Result ────────────────────────────────────────
+    function renderResult(result) {
+        const colors = {
+            red:    { btn:'#DC2626', bg:'#FEF2F2',
+                      border:'#DC2626', text:'#DC2626' },
+            orange: { btn:'#D97706', bg:'#FFFBEB',
+                      border:'#F59E0B', text:'#D97706' },
+            green:  { btn:'#059669', bg:'#F0FFF4',
+                      border:'#10B981', text:'#059669' }
+        };
+        const c = colors[result.color];
+
+        const contactsHtml = result.contacts.map(contact => {
+            if (contact.type === 'maps') {
+                return `
+                <a href="https://www.google.com/maps/search/hospital+near+me"
+                target="_blank"
+                style="display:flex;align-items:center;gap:12px;
+                padding:14px 16px;background:white;
+                border:1.5px solid #E2E8F0;border-radius:10px;
+                text-decoration:none;margin-bottom:8px;">
+                    <span style="font-size:24px;">📍</span>
+                    <div style="flex:1;">
+                        <div style="font-weight:700;font-size:14px;
+                        color:#1E293B;">${contact.name}</div>
+                        <div style="font-size:12px;color:#64748B;">
+                        Opens Google Maps</div>
+                    </div>
+                    <span style="color:#2563EB;font-weight:700;">→</span>
+                </a>`;
+            }
+            return `
+            <a href="tel:${contact.number}"
+            style="display:flex;align-items:center;gap:12px;
+            padding:14px 16px;
+            background:${contact.type==='emergency'?'#FEF2F2':'white'};
+            border:1.5px solid ${contact.type==='emergency'?
+                '#FECACA':'#E2E8F0'};
+            border-radius:10px;text-decoration:none;margin-bottom:8px;">
+                <span style="font-size:28px;">
+                ${contact.type==='emergency'?'🚨':'📞'}</span>
+                <div style="flex:1;">
+                    <div style="font-weight:700;font-size:14px;
+                    color:#1E293B;">${contact.name}</div>
+                    <div style="font-size:20px;font-weight:800;
+                    color:${contact.type==='emergency'?
+                        '#DC2626':'#2563EB'};">
+                    ${contact.number}</div>
+                </div>
+                <span style="font-size:12px;color:#94A3B8;
+                font-weight:600;">TAP TO CALL</span>
+            </a>`;
+        }).join('');
+
+        const stepsHtml = result.immediate_steps.map((step, i) => `
+            <div style="display:flex;align-items:flex-start;
+            gap:12px;padding:10px 0;
+            border-bottom:1px solid #F1F5F9;">
+                <div style="background:${c.btn};color:white;
+                border-radius:50%;width:26px;height:26px;
+                display:flex;align-items:center;justify-content:center;
+                font-size:12px;font-weight:800;flex-shrink:0;">
+                ${i+1}</div>
+                <div style="font-size:14px;color:#374151;
+                line-height:1.6;">${step}</div>
+            </div>`).join('');
+
+        const sympHtml = result.symptoms_detected.map(s => `
+            <span style="display:inline-block;background:${c.bg};
+            color:${c.text};border:1px solid ${c.border}44;
+            border-radius:20px;padding:4px 12px;font-size:13px;
+            margin:3px;">${s}</span>`).join('');
+
+        const condHtml = result.possible_conditions
+            .filter(p => !p.includes('Non-cardiac'))
+            .map(p => `
+            <span style="display:inline-block;background:#F1F5F9;
+            color:#374151;border:1px solid #E2E8F0;
+            border-radius:20px;padding:4px 12px;
+            font-size:13px;margin:3px;">${p}</span>`).join('');
+
+        document.getElementById('resultCard').innerHTML = `
+        <div style="background:white;border-radius:16px;
+        box-shadow:0 4px 24px rgba(0,0,0,0.1);overflow:hidden;">
+
+            <div style="background:${c.btn};padding:24px;
+            color:white;text-align:center;">
+                <div style="font-size:28px;font-weight:800;
+                margin-bottom:6px;">${result.level}</div>
+                <div style="font-size:16px;font-weight:600;
+                opacity:0.95;">${result.headline}</div>
+                <div style="font-size:14px;opacity:0.8;
+                margin-top:6px;">${result.description}</div>
+            </div>
+
+            <div style="padding:20px 24px;">
+
+                <div style="margin-bottom:18px;">
+                    <div style="font-weight:700;font-size:14px;
+                    color:#1E293B;margin-bottom:8px;">
+                    🔍 Symptoms Reported</div>
+                    ${sympHtml}
+                </div>
+
+                ${condHtml ? `
+                <div style="margin-bottom:18px;">
+                    <div style="font-weight:700;font-size:14px;
+                    color:#1E293B;margin-bottom:8px;">
+                    🏥 This Could Indicate</div>
+                    ${condHtml}
+                    <div style="font-size:11px;color:#94A3B8;
+                    margin-top:6px;">
+                    ⚠️ Possibilities only — not a diagnosis</div>
+                </div>` : ''}
+
+                <div style="margin-bottom:18px;">
+                    <div style="font-weight:700;font-size:14px;
+                    color:#1E293B;margin-bottom:10px;">
+                    📋 What To Do Right Now</div>
+                    ${stepsHtml}
+                </div>
+
+                <div style="margin-bottom:18px;">
+                    <div style="font-weight:700;font-size:14px;
+                    color:#1E293B;margin-bottom:10px;">
+                    📞 Who To Contact</div>
+                    ${contactsHtml}
+                </div>
+
+                <div style="background:#FFFBEB;
+                border-left:4px solid #F59E0B;border-radius:8px;
+                padding:12px 16px;font-size:13px;color:#78350F;
+                margin-bottom:16px;">
+                    ⚠️ Guidance only — not a medical diagnosis.
+                    Always call emergency services if in doubt.
+                </div>
+
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button onclick="resetForm()"
+                    style="background:#F1F5F9;color:#1E293B;
+                    border:none;padding:10px 20px;border-radius:8px;
+                    font-weight:600;font-size:14px;cursor:pointer;">
+                    🔄 Check Again</button>
+                    <a href="index.html"
+                    style="background:linear-gradient(135deg,
+                    #1E3A5F,#2563EB);color:white;padding:10px 20px;
+                    border-radius:8px;font-weight:600;font-size:14px;
+                    text-decoration:none;">
+                    📊 Assess My Risk</a>
+                    <a href="home.html"
+                    style="background:white;color:#1E293B;
+                    border:1.5px solid #E2E8F0;padding:10px 20px;
+                    border-radius:8px;font-weight:600;font-size:14px;
+                    text-decoration:none;">🏠 Home</a>
+                </div>
+
+            </div>
+        </div>`;
+
+        document.getElementById('resultCard').style.display = 'block';
+        document.getElementById('resultCard').scrollIntoView(
+            { behavior: 'smooth' });
+    }
+
+    // ── Reset ────────────────────────────────────────────────
+    function resetForm() {
+        Object.keys(state).forEach(k => {
+            state[k] = k === 'chestSev' || k === 'breathSev' ? null : false;
+        });
+        document.querySelectorAll('.symptom-btn').forEach(btn => {
+            btn.classList.remove('selected');
+            if (btn.id === 'btn-faint')
+                btn.classList.add('selected-red');
+        });
+        document.querySelectorAll('.severity-quick')
+            .forEach(s => s.classList.remove('show'));
+        document.querySelectorAll('.sev-btn')
+            .forEach(b => b.className = 'sev-btn');
+        if (document.getElementById('radiating'))
+            document.getElementById('radiating').checked = false;
+        document.getElementById('heart_rate').value = '';
+        document.getElementById('systolic_bp').value = '';
+        document.getElementById('resultCard').style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Init fainting as not selected by default ─────────────
+    document.getElementById('btn-faint').classList.remove('selected-red');
+
+    // ── Navbar Auth ──────────────────────────────────────────
+function checkAuth() {
+    const user = localStorage.getItem('user');
+    if (user) {
+        const u = JSON.parse(user);
+        document.getElementById('guestNav').style.display = 'none';
+        document.getElementById('userNav').style.display = 'flex';
+        document.getElementById('navUsername').textContent =
+            '👤 ' + u.name;
+    } else {
+        document.getElementById('guestNav').style.display = 'flex';
+        document.getElementById('userNav').style.display = 'none';
+    }
+}
+
+// ── Highlight Active Page ────────────────────────────────
+function highlightActivePage() {
+    const page = window.location.pathname.split('/').pop();
+    const map = {
+        'index.html':           'nav-risk',
+        'triage.html':          'nav-triage',
+        'recommendations.html': 'nav-rec',
+    };
+    const activeId = map[page];
+    if (activeId) {
+        const el = document.getElementById(activeId);
+        if (el) {
+            el.style.background = 'rgba(255,255,255,0.18)';
+            el.style.color = 'white';
+            el.style.fontWeight = '700';
+        }
+    }
+}
+
+// ── Mobile Menu ──────────────────────────────────────────
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.style.display =
+        menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── Logout ───────────────────────────────────────────────
+async function handleLogout() {
+    try {
+        await fetch('http://127.0.0.1:5000/api/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+    } catch(e) {}
+    localStorage.removeItem('user');
+    localStorage.removeItem('lastPrediction');
+    localStorage.removeItem('userBasicInfo');
+    window.location.href = 'login.html';
+}
+
+checkAuth();
+highlightActivePage();
+
+</script>
 </body>
 </html>

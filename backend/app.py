@@ -243,149 +243,165 @@ def triage():
     try:
         data = request.get_json()
 
-        # Get symptoms
-        chest_pain = int(data.get('chest_pain', 0))
+        chest_pain          = int(data.get('chest_pain', 0))
         chest_pain_severity = int(data.get('chest_pain_severity', 0))
-        radiating_pain = int(data.get('radiating_pain', 0))
+        radiating_pain      = int(data.get('radiating_pain', 0))
         shortness_of_breath = int(data.get('shortness_of_breath', 0))
-        breath_severity = data.get('breath_severity', 'none')
-        palpitations = int(data.get('palpitations', 0))
-        dizziness = int(data.get('dizziness', 0))
-        fainting = int(data.get('fainting', 0))
-        sweating = int(data.get('sweating', 0))
-        nausea = int(data.get('nausea', 0))
-        fatigue = int(data.get('fatigue', 0))
+        breath_severity     = data.get('breath_severity', 'none')
+        palpitations        = int(data.get('palpitations', 0))
+        dizziness           = int(data.get('dizziness', 0))
+        fainting            = int(data.get('fainting', 0))
+        sweating            = int(data.get('sweating', 0))
+        nausea              = int(data.get('nausea', 0))
+        fatigue             = int(data.get('fatigue', 0))
+        heart_rate          = int(data.get('heart_rate', 0))
+        systolic_bp         = int(data.get('systolic_bp', 0))
+        symptom_duration    = data.get('symptom_duration', 'hours')
+        cardiac_history     = int(data.get('cardiac_history', 0))
 
-        # Get vitals
-        heart_rate = int(data.get('heart_rate', 0))
-        systolic_bp = int(data.get('systolic_bp', 0))
-
-        # Get context
-        symptom_duration = data.get('symptom_duration', 'hours')
-        cardiac_history = int(data.get('cardiac_history', 0))
-
-        # ── Triage Logic ─────────────────────────────────────
-
-        # EMERGENCY conditions
+        # ── Determine Urgency Level ──────────────────────────
         emergency = False
-        emergency_reasons = []
+        urgent    = False
+        symptoms_detected = []
+        possible_conditions = []
 
+        # Emergency triggers
         if chest_pain and chest_pain_severity >= 7:
             emergency = True
-            emergency_reasons.append("Severe chest pain")
-
+            symptoms_detected.append("Severe chest pain")
         if chest_pain and radiating_pain:
             emergency = True
-            emergency_reasons.append("Chest pain radiating to arm/jaw")
-
-        if chest_pain and shortness_of_breath and breath_severity == 'severe':
-            emergency = True
-            emergency_reasons.append("Chest pain with severe shortness of breath")
-
+            symptoms_detected.append("Chest pain radiating to arm or jaw")
+            possible_conditions.append("Heart Attack (Myocardial Infarction)")
         if fainting:
             emergency = True
-            emergency_reasons.append("Fainting episode")
-
-        if heart_rate > 150 or heart_rate < 40:
-            if heart_rate > 0:
-                emergency = True
-                emergency_reasons.append(f"Dangerous heart rate: {heart_rate} BPM")
-
+            symptoms_detected.append("Fainting or loss of consciousness")
+            possible_conditions.append("Cardiac Arrhythmia or Severe Drop in Blood Pressure")
+        if heart_rate > 150 or (0 < heart_rate < 40):
+            emergency = True
+            symptoms_detected.append(f"Dangerous heart rate: {heart_rate} BPM")
+            possible_conditions.append("Serious Heart Rhythm Problem (Arrhythmia)")
         if systolic_bp > 180:
-            if systolic_bp > 0:
-                emergency = True
-                emergency_reasons.append(f"Severely high BP: {systolic_bp} mmHg")
+            emergency = True
+            symptoms_detected.append(f"Severely high BP: {systolic_bp} mmHg")
+            possible_conditions.append("Hypertensive Crisis")
+        if chest_pain and shortness_of_breath and breath_severity == 'severe':
+            emergency = True
+            symptoms_detected.append("Chest pain with severe breathlessness")
+            possible_conditions.append("Heart Attack or Pulmonary Embolism")
 
+        # Urgent triggers
+        if not emergency:
+            if chest_pain and chest_pain_severity >= 4:
+                urgent = True
+                symptoms_detected.append("Moderate chest pain")
+                possible_conditions.append("Unstable Angina or Cardiac Stress")
+            if shortness_of_breath and breath_severity in ['moderate','severe']:
+                urgent = True
+                symptoms_detected.append("Significant shortness of breath")
+                possible_conditions.append("Heart Failure or Respiratory Issue")
+            if palpitations and cardiac_history:
+                urgent = True
+                symptoms_detected.append("Palpitations with known cardiac history")
+                possible_conditions.append("Cardiac Arrhythmia")
+            if dizziness and chest_pain:
+                urgent = True
+                symptoms_detected.append("Dizziness combined with chest pain")
+                possible_conditions.append("Reduced Blood Flow to Brain")
+            if heart_rate > 120:
+                urgent = True
+                symptoms_detected.append(f"Elevated heart rate: {heart_rate} BPM")
+            if systolic_bp > 160:
+                urgent = True
+                symptoms_detected.append(f"High blood pressure: {systolic_bp} mmHg")
+            if symptom_duration == 'now' and (chest_pain or shortness_of_breath):
+                urgent = True
+                symptoms_detected.append("Sudden onset of cardiac symptoms")
+
+        # Non-urgent symptoms
+        if not emergency and not urgent:
+            if chest_pain: symptoms_detected.append("Mild chest discomfort")
+            if palpitations: symptoms_detected.append("Occasional palpitations")
+            if fatigue: symptoms_detected.append("Fatigue")
+            if nausea: symptoms_detected.append("Nausea")
+            if dizziness: symptoms_detected.append("Mild dizziness")
+            if sweating: symptoms_detected.append("Unusual sweating")
+            possible_conditions.append("Non-cardiac cause — stress, dehydration or minor issue")
+
+        if not symptoms_detected:
+            symptoms_detected = ["No significant symptoms detected"]
+
+        # Remove duplicates
+        possible_conditions = list(dict.fromkeys(possible_conditions))
+
+        # ── Build Response Based on Level ───────────────────
         if emergency:
             return jsonify({
-                "triage_level": "Emergency",
+                "level": "Emergency",
                 "color": "red",
-                "action": "Call 911 immediately or go to the nearest Emergency Room",
-                "wait_time": "Immediate — do not wait",
-                "reasons": emergency_reasons,
-                "advice": [
-                    "Call emergency services (911) immediately",
-                    "Do not drive yourself to the hospital",
-                    "Chew an aspirin if not allergic",
-                    "Sit down and stay calm",
-                    "Have someone stay with you"
+                "headline": "Seek Immediate Medical Attention",
+                "description": "Your symptoms suggest a possible cardiac emergency. Every minute matters.",
+                "symptoms_detected": symptoms_detected,
+                "possible_conditions": possible_conditions,
+                "immediate_steps": [
+                    "Call 112 (National Emergency) or 108 (Ambulance) immediately",
+                    "Do NOT drive yourself — wait for the ambulance",
+                    "Sit or lie down in a comfortable position",
+                    "Loosen any tight clothing around your chest",
+                    "Chew one aspirin (325mg) if available and not allergic",
+                    "Have someone stay with you until help arrives",
+                    "Unlock your front door so paramedics can enter"
+                ],
+                "contacts": [
+                    {"name": "National Emergency", "number": "112", "type": "emergency"},
+                    {"name": "Ambulance (108)", "number": "108", "type": "emergency"},
+                    {"name": "Cardiac Helpline", "number": "1800-112-114", "type": "helpline"},
                 ]
             })
 
-        # URGENT conditions
-        urgent = False
-        urgent_reasons = []
-
-        if chest_pain and chest_pain_severity >= 4:
-            urgent = True
-            urgent_reasons.append("Moderate chest pain")
-
-        if shortness_of_breath and breath_severity in ['moderate', 'severe']:
-            urgent = True
-            urgent_reasons.append("Significant shortness of breath")
-
-        if palpitations and cardiac_history:
-            urgent = True
-            urgent_reasons.append("Palpitations with cardiac history")
-
-        if dizziness and chest_pain:
-            urgent = True
-            urgent_reasons.append("Dizziness with chest pain")
-
-        if heart_rate > 120:
-            if heart_rate > 0:
-                urgent = True
-                urgent_reasons.append(f"Elevated heart rate: {heart_rate} BPM")
-
-        if systolic_bp > 160:
-            if systolic_bp > 0:
-                urgent = True
-                urgent_reasons.append(f"High blood pressure: {systolic_bp} mmHg")
-
-        if symptom_duration == 'now' and (chest_pain or shortness_of_breath):
-            urgent = True
-            urgent_reasons.append("Sudden onset of cardiac symptoms")
-
-        if urgent:
+        elif urgent:
             return jsonify({
-                "triage_level": "Urgent",
+                "level": "Urgent",
                 "color": "orange",
-                "action": "Visit Emergency Room or Urgent Care within 2 hours",
-                "wait_time": "Within 1-2 hours",
-                "reasons": urgent_reasons,
-                "advice": [
-                    "Go to Emergency Room or Urgent Care now",
-                    "Do not wait until tomorrow",
-                    "Bring list of current medications",
-                    "Have someone drive you",
-                    "Monitor symptoms — call 911 if they worsen"
+                "headline": "Visit a Hospital or Clinic Within 2 Hours",
+                "description": "Your symptoms need medical evaluation soon. Do not wait until tomorrow.",
+                "symptoms_detected": symptoms_detected,
+                "possible_conditions": possible_conditions,
+                "immediate_steps": [
+                    "Go to the nearest hospital Emergency or Urgent Care department",
+                    "Do not drive alone — have someone accompany you",
+                    "Carry a list of your current medications",
+                    "Note when symptoms started and how they have changed",
+                    "Call ahead if possible so the hospital can prepare",
+                    "If symptoms worsen on the way, call 112 immediately"
+                ],
+                "contacts": [
+                    {"name": "National Emergency", "number": "112", "type": "emergency"},
+                    {"name": "Ambulance (108)", "number": "108", "type": "emergency"},
+                    {"name": "Find Nearest Hospital", "number": "maps", "type": "maps"},
                 ]
             })
 
-        # NON-URGENT
-        non_urgent_reasons = []
-        if chest_pain: non_urgent_reasons.append("Mild chest discomfort")
-        if palpitations: non_urgent_reasons.append("Occasional palpitations")
-        if fatigue: non_urgent_reasons.append("Fatigue reported")
-        if nausea: non_urgent_reasons.append("Nausea reported")
-        if dizziness: non_urgent_reasons.append("Mild dizziness")
-        if not non_urgent_reasons:
-            non_urgent_reasons.append("No significant cardiac symptoms detected")
-
-        return jsonify({
-            "triage_level": "Non-Urgent",
-            "color": "green",
-            "action": "Schedule an appointment with your doctor within 1-2 weeks",
-            "wait_time": "Within 1-2 weeks",
-            "reasons": non_urgent_reasons,
-            "advice": [
-                "Schedule a checkup with your primary care doctor",
-                "Monitor your symptoms — note if they worsen",
-                "Maintain a record of when symptoms occur",
-                "If symptoms suddenly worsen, seek immediate care",
-                "Consider lifestyle modifications"
-            ]
-        })
+        else:
+            return jsonify({
+                "level": "Non-Urgent",
+                "color": "green",
+                "headline": "Schedule a Doctor's Appointment",
+                "description": "Your symptoms do not suggest an immediate emergency, but should be discussed with your doctor.",
+                "symptoms_detected": symptoms_detected,
+                "possible_conditions": possible_conditions,
+                "immediate_steps": [
+                    "Schedule an appointment with your doctor within 1–2 weeks",
+                    "Keep a symptom diary — note when symptoms occur",
+                    "Monitor for any worsening and seek urgent care if needed",
+                    "Avoid strenuous activity until you have spoken to a doctor",
+                    "Stay hydrated and get adequate rest"
+                ],
+                "contacts": [
+                    {"name": "National Emergency", "number": "112", "type": "emergency"},
+                    {"name": "Find Nearest Clinic", "number": "maps", "type": "maps"},
+                ]
+            })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -237,19 +237,247 @@
             font-size: 13px;
             margin-top: 60px;
         }
+        
+       
+
+/* ── Gamification Section ── */
+.gamification-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+.streak-box {
+    background: linear-gradient(135deg, #1E3A5F, #2563EB);
+    padding: 24px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.streak-num {
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1;
+}
+.streak-label {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-top: 4px;
+}
+.badge-grid {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 20px 24px;
+}
+.badge-item {
+    text-align: center;
+    flex: 1;
+    min-width: 80px;
+    padding: 16px 12px;
+    border-radius: 12px;
+    border: 2px solid #E2E8F0;
+    background: #F8FAFC;
+    transition: all 0.2s;
+}
+.badge-item.earned {
+    background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+    border-color: #F59E0B;
+    box-shadow: 0 4px 12px rgba(245,158,11,0.2);
+}
+.badge-item.locked {
+    opacity: 0.45;
+    filter: grayscale(1);
+}
+.badge-emoji { font-size: 32px; margin-bottom: 6px; }
+.badge-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1E293B;
+    margin-bottom: 3px;
+}
+.badge-desc { font-size: 11px; color: #64748B; }
+
+.reminder-banner {
+    background: linear-gradient(135deg, #FEF3C7, #FFFBEB);
+    border: 1.5px solid #F59E0B;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.goal-tracker {
+    padding: 20px 24px;
+}
+.goal-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+}
+.goal-option:hover { border-color: #2563EB; background: #EFF6FF; }
+.goal-option.active { border-color: #2563EB; background: #EFF6FF; }
+.goal-option input[type="radio"] { accent-color: #2563EB; width: 18px; height: 18px; }
+.goal-progress-bar {
+    background: #E2E8F0;
+    border-radius: 20px;
+    height: 10px;
+    overflow: hidden;
+    margin: 8px 0 4px;
+}
+.goal-progress-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #2563EB, #10B981);
+    transition: width 0.5s ease;
+}
     </style>
+
 </head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-dark">
-    <div class="container d-flex justify-content-between align-items-center">
-        <a href="home.html" class="navbar-brand">❤️ CardioPredict AI</a>
-        <a href="index.html" style="color:white; font-size:14px;
-        text-decoration:none; background:rgba(255,255,255,0.15);
-        padding:6px 16px; border-radius:20px;">
-            ← New Assessment
-        </a>
+<!-- ── Navbar ── -->
+<nav style="background:linear-gradient(90deg,#0F2044,#1a3a6e);
+padding:0; box-shadow:0 2px 12px rgba(0,0,0,0.2);
+position:sticky; top:0; z-index:999;">
+    <div class="container">
+        <div style="display:flex; align-items:center;
+        justify-content:space-between; padding:12px 0; gap:12px;">
+
+            <!-- Brand -->
+            <a href="home.html"
+            style="font-size:20px; font-weight:800; color:white;
+            text-decoration:none; letter-spacing:0.3px; flex-shrink:0;">
+                ❤️ CardioPredict AI
+            </a>
+
+            <!-- Module Links (hidden on mobile, shown on desktop) -->
+            <div class="d-none d-md-flex align-items-center"
+            style="gap:4px;">
+                <a href="index.html" id="nav-risk"
+                style="color:rgba(255,255,255,0.8); text-decoration:none;
+                padding:7px 14px; border-radius:20px; font-size:14px;
+                font-weight:500; transition:all 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.12)';
+                this.style.color='white'"
+                onmouseout="this.style.background='transparent';
+                this.style.color='rgba(255,255,255,0.8)'">
+                    📊 Risk Assessment
+                </a>
+                <a href="triage.html" id="nav-triage"
+                style="color:rgba(255,255,255,0.8); text-decoration:none;
+                padding:7px 14px; border-radius:20px; font-size:14px;
+                font-weight:500; transition:all 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.12)';
+                this.style.color='white'"
+                onmouseout="this.style.background='transparent';
+                this.style.color='rgba(255,255,255,0.8)'">
+                    🩺 Symptoms
+                </a>
+                <a href="recommendations.html" id="nav-rec"
+                style="color:rgba(255,255,255,0.8); text-decoration:none;
+                padding:7px 14px; border-radius:20px; font-size:14px;
+                font-weight:500; transition:all 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.12)';
+                this.style.color='white'"
+                onmouseout="this.style.background='transparent';
+                this.style.color='rgba(255,255,255,0.8)'">
+                    💊 Health Advice
+                </a>
+            </div>
+
+            <!-- Auth -->
+            <div style="display:flex; align-items:center; gap:8px;
+            flex-shrink:0;">
+                <!-- Guest -->
+                <div id="guestNav" class="d-flex gap-2">
+                    <a href="login.html"
+                    style="color:white; font-size:13px;
+                    text-decoration:none;
+                    border:1.5px solid rgba(255,255,255,0.4);
+                    padding:6px 14px; border-radius:20px;
+                    transition:all 0.2s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.1)'"
+                    onmouseout="this.style.background='transparent'">
+                        Log In
+                    </a>
+                    <a href="login.html"
+                    style="color:#0F2044; font-size:13px;
+                    text-decoration:none; background:white;
+                    padding:6px 14px; border-radius:20px;
+                    font-weight:600; transition:all 0.2s;"
+                    onmouseover="this.style.background='#E0E7FF'"
+                    onmouseout="this.style.background='white'">
+                        Sign Up
+                    </a>
+                </div>
+                <!-- User -->
+                <div id="userNav" style="display:none;
+                align-items:center; gap:8px;">
+                    <span id="navUsername"
+                    style="color:white; font-size:13px;
+                    font-weight:500;"></span>
+                    <button onclick="handleLogout()"
+                    style="color:white; font-size:12px;
+                    background:rgba(255,255,255,0.12);
+                    border:none; padding:6px 14px;
+                    border-radius:20px; cursor:pointer;
+                    transition:all 0.2s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.22)'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+                        Logout
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="d-md-none"
+                onclick="toggleMobileMenu()"
+                style="background:rgba(255,255,255,0.12);
+                border:none; color:white; padding:6px 12px;
+                border-radius:8px; font-size:18px; cursor:pointer;">
+                    ☰
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobileMenu" style="display:none;
+        border-top:1px solid rgba(255,255,255,0.1);
+        padding:12px 0;">
+            <a href="index.html"
+            style="display:block; color:rgba(255,255,255,0.85);
+            text-decoration:none; padding:10px 4px; font-size:15px;
+            font-weight:500;">
+                📊 Risk Assessment
+            </a>
+            <a href="triage.html"
+            style="display:block; color:rgba(255,255,255,0.85);
+            text-decoration:none; padding:10px 4px; font-size:15px;
+            font-weight:500;">
+                🩺 Symptom Checker
+            </a>
+            <a href="recommendations.html"
+            style="display:block; color:rgba(255,255,255,0.85);
+            text-decoration:none; padding:10px 4px; font-size:15px;
+            font-weight:500;">
+                💊 Health Advice
+            </a>
+        </div>
     </div>
 </nav>
 
@@ -288,9 +516,50 @@
             </div>
 
             <!-- Main Content -->
-             <!-- Progress Comparison (shown only for logged-in users with 2+ assessments) -->
+              <!-- Progress Comparison (shown only for logged-in users with 2+ assessments) -->
 <div id="progressBox" style="display:none;"></div>
             <div id="mainContent" style="display:none;">
+             <!-- Tab Navigation -->
+<div style="display:flex; gap:0; background:white;
+border-radius:12px; padding:6px; box-shadow:0 2px 12px
+rgba(0,0,0,0.07); margin-bottom:24px;">
+    <button onclick="switchTab('recommendations')"
+    id="tab-rec"
+    style="flex:1; padding:12px; border:none; border-radius:8px;
+    font-size:15px; font-weight:700; cursor:pointer;
+    background:linear-gradient(135deg,#1E3A5F,#2563EB);
+    color:white; transition:all 0.3s;">
+        📋 My Recommendations
+    </button>
+    <button onclick="switchTab('goals')"
+    id="tab-goals"
+    style="flex:1; padding:12px; border:none; border-radius:8px;
+    font-size:15px; font-weight:600; cursor:pointer;
+    background:transparent; color:#64748B; transition:all 0.3s;">
+        🏆 Goals & Progress
+    </button>
+</div>
+
+<!-- Recommendations Tab -->
+<div id="content-recommendations">
+    <!-- Weekly Reminder Banner -->
+<div class="reminder-banner" id="reminderBanner" style="display:none;">
+    <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:28px;">⏰</span>
+        <div>
+            <div style="font-weight:700; font-size:15px; color:#1E293B;">
+                Time for a Check-in!</div>
+            <div style="font-size:13px; color:#64748B;" id="reminderText">
+                It has been a while since your last assessment.</div>
+        </div>
+    </div>
+    <a href="index.html"
+    style="background:#F59E0B; color:white; padding:10px 20px;
+    border-radius:8px; font-weight:600; font-size:14px;
+    text-decoration:none; white-space:nowrap;">
+        Reassess Now →
+    </a>
+</div>
 
                 <!-- 1. Risk Score Card -->
                 <div class="summary-card">
@@ -353,6 +622,145 @@
                         <div id="priorityList"></div>
                     </div>
                 </div>
+</div>
+
+<!-- Goals Tab -->
+<div id="content-goals" style="display:none;">
+   <!-- Gamification Section -->
+<div class="gamification-card" id="gamificationSection"
+     style="display:none;">
+    <div class="card-header-bar">
+        🏆 Your Progress & Goals
+    </div>
+
+    <!-- Streak -->
+    <div class="streak-box">
+        <div>
+            <div style="font-size:13px; opacity:0.8;
+            font-weight:600; margin-bottom:4px;">
+            ASSESSMENT STREAK</div>
+            <div style="display:flex; align-items:flex-end; gap:8px;">
+                <div class="streak-num" id="streakNum">0</div>
+                <div style="padding-bottom:8px;">
+                    <div style="font-size:16px; font-weight:700;">weeks</div>
+                    <div class="streak-label">in a row</div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:right;">
+            <div style="font-size:13px; opacity:0.8;
+            margin-bottom:4px;">Total Assessments</div>
+            <div style="font-size:36px; font-weight:800;"
+                 id="totalAssessments">0</div>
+            <div style="font-size:13px; opacity:0.75;"
+                 id="lastAssessedDate">—</div>
+        </div>
+    </div>
+
+    <!-- Badges -->
+    <div style="padding:20px 24px 0;">
+        <div style="font-weight:700; font-size:15px;
+        color:#1E293B; margin-bottom:4px;">
+        🎖️ Achievements</div>
+        <div style="font-size:13px; color:#64748B; margin-bottom:16px;">
+        Complete assessments to unlock badges</div>
+    </div>
+    <div class="badge-grid" id="badgeGrid"></div>
+
+    <!-- Goal Tracker -->
+    <div class="goal-tracker">
+        <div style="font-weight:700; font-size:15px;
+        color:#1E293B; margin-bottom:4px;">
+        🎯 My Health Goal</div>
+        <div style="font-size:13px; color:#64748B;
+        margin-bottom:16px;">
+        Pick one goal to focus on this month</div>
+
+        <div id="goalSelector">
+            <div class="goal-option" onclick="selectGoal('exercise')">
+                <input type="radio" name="goal" value="exercise">
+                <span style="font-size:20px;">🏃</span>
+                <div>
+                    <div style="font-weight:600; font-size:14px;">
+                    Exercise 30 min daily</div>
+                    <div style="font-size:12px; color:#64748B;">
+                    Build a consistent activity habit</div>
+                </div>
+            </div>
+            <div class="goal-option" onclick="selectGoal('diet')">
+                <input type="radio" name="goal" value="diet">
+                <span style="font-size:20px;">🥗</span>
+                <div>
+                    <div style="font-weight:600; font-size:14px;">
+                    Eat healthy every day</div>
+                    <div style="font-size:12px; color:#64748B;">
+                    Follow your diet recommendations</div>
+                </div>
+            </div>
+            <div class="goal-option" onclick="selectGoal('nosmoke')">
+                <input type="radio" name="goal" value="nosmoke">
+                <span style="font-size:20px;">🚭</span>
+                <div>
+                    <div style="font-weight:600; font-size:14px;">
+                    Stay smoke-free</div>
+                    <div style="font-size:12px; color:#64748B;">
+                    Track days without smoking</div>
+                </div>
+            </div>
+            <div class="goal-option" onclick="selectGoal('bp')">
+                <input type="radio" name="goal" value="bp">
+                <span style="font-size:20px;">💊</span>
+                <div>
+                    <div style="font-weight:600; font-size:14px;">
+                    Monitor blood pressure daily</div>
+                    <div style="font-size:12px; color:#64748B;">
+                    Log your BP every morning</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goal Progress (shown after goal is selected) -->
+        <div id="goalProgress" style="display:none; margin-top:16px;">
+            <div style="display:flex; justify-content:space-between;
+            align-items:center; margin-bottom:8px;">
+                <div style="font-weight:600; font-size:14px;
+                color:#1E293B;" id="goalTitle"></div>
+                <div style="font-size:13px; color:#64748B;">
+                    <span id="goalDays">0</span> / 30 days
+                </div>
+            </div>
+            <div class="goal-progress-bar">
+                <div class="goal-progress-fill"
+                     id="goalFill" style="width:0%"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between;
+            margin-top:8px; gap:10px; flex-wrap:wrap;">
+                <button onclick="logGoalDay()"
+                style="background:linear-gradient(135deg,#059669,#10B981);
+                color:white; border:none; padding:10px 20px;
+                border-radius:8px; font-weight:600; font-size:14px;
+                cursor:pointer;">
+                    ✅ Log Today
+                </button>
+                <button onclick="resetGoal()"
+                style="background:#F1F5F9; color:#64748B; border:none;
+                padding:10px 16px; border-radius:8px; font-size:13px;
+                cursor:pointer;">
+                    Change Goal
+                </button>
+            </div>
+            <div id="goalMessage" style="margin-top:10px; font-size:13px;
+            color:#059669; font-weight:600;"></div>
+        </div>
+
+    </div>
+</div>
+</div>
+             
+                
+                
+
+                
 
                 <!-- 5. Actions -->
                 <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;">
@@ -384,6 +792,37 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    function switchTab(tab) {
+    // Update buttons
+    const recBtn   = document.getElementById('tab-rec');
+    const goalBtn  = document.getElementById('tab-goals');
+    const recContent  = document.getElementById('content-recommendations');
+    const goalContent = document.getElementById('content-goals');
+
+    if (tab === 'recommendations') {
+        recBtn.style.background =
+            'linear-gradient(135deg,#1E3A5F,#2563EB)';
+        recBtn.style.color  = 'white';
+        recBtn.style.fontWeight = '700';
+        goalBtn.style.background = 'transparent';
+        goalBtn.style.color = '#64748B';
+        goalBtn.style.fontWeight = '600';
+        recContent.style.display  = 'block';
+        goalContent.style.display = 'none';
+    } else {
+        goalBtn.style.background =
+            'linear-gradient(135deg,#065F46,#10B981)';
+        goalBtn.style.color = 'white';
+        goalBtn.style.fontWeight = '700';
+        recBtn.style.background = 'transparent';
+        recBtn.style.color = '#64748B';
+        recBtn.style.fontWeight = '600';
+        recContent.style.display  = 'none';
+        goalContent.style.display = 'block';
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
     // ── Category Config ──────────────────────────────────────
     const categories = [
@@ -628,6 +1067,23 @@ async function showProgress(currentScore, currentLevel) {
         // Auto-open diet tab
         showCategory('diet');
         showProgress(result.risk_score, result.risk_level);
+
+// Load gamification after progress check
+const histUser = localStorage.getItem('user');
+if (histUser) {
+    const userId = JSON.parse(histUser).id;
+    fetch(`http://127.0.0.1:5000/api/history?user_id=${userId}`)
+        .then(r => r.json())
+        .then(hist => {
+            const total = hist.history ? hist.history.length : 0;
+            const improved = hist.history && hist.history.length >= 2 &&
+                hist.history[0].risk_score < hist.history[1].risk_score;
+            loadGamification(total, improved);
+        })
+        .catch(() => loadGamification(0, false));
+} else {
+    loadGamification(0, false);
+}
     }
 
     // ── Load Recommendations ─────────────────────────────────
@@ -681,6 +1137,237 @@ async function showProgress(currentScore, currentLevel) {
     }
 
     loadRecommendations();
+
+    // ── Badge Definitions ────────────────────────────────────
+const BADGES = [
+    {
+        id: 'first',
+        emoji: '🌟',
+        name: 'First Step',
+        desc: 'Completed your first assessment',
+        requirement: 1
+    },
+    {
+        id: 'dedicated',
+        emoji: '💪',
+        name: 'Dedicated',
+        desc: 'Completed 5 assessments',
+        requirement: 5
+    },
+    {
+        id: 'champion',
+        emoji: '🏆',
+        name: 'Heart Champion',
+        desc: 'Completed 10 assessments',
+        requirement: 10
+    },
+    {
+        id: 'streak3',
+        emoji: '🔥',
+        name: 'On Fire',
+        desc: '3 week assessment streak',
+        requirement: 'streak3'
+    },
+    {
+        id: 'goalmaster',
+        emoji: '🎯',
+        name: 'Goal Master',
+        desc: 'Logged 7 days on a health goal',
+        requirement: 'goal7'
+    },
+    {
+        id: 'improver',
+        emoji: '📈',
+        name: 'Improver',
+        desc: 'Risk score decreased from last assessment',
+        requirement: 'improved'
+    },
+];
+
+// ── Goal Names ───────────────────────────────────────────
+const GOAL_NAMES = {
+    exercise: '🏃 Exercise 30 min daily',
+    diet:     '🥗 Eat healthy every day',
+    nosmoke:  '🚭 Stay smoke-free',
+    bp:       '💊 Monitor BP daily'
+};
+
+// ── Load Gamification Data ───────────────────────────────
+async function loadGamification(totalAssessments, riskImproved) {
+    const user = localStorage.getItem('user');
+    if (!user) return;
+
+    document.getElementById('gamificationSection').style.display = 'block';
+
+    // ── Streak Calculation ───────────────────────────────
+    const streakData = JSON.parse(
+        localStorage.getItem('streakData') || '{"streak":0,"lastWeek":null}'
+    );
+    const now = new Date();
+    const weekNum = Math.floor(now.getTime() / (7 * 24 * 60 * 60 * 1000));
+
+    if (streakData.lastWeek === weekNum - 1) {
+        streakData.streak += 1;
+    } else if (streakData.lastWeek !== weekNum) {
+        streakData.streak = 1;
+    }
+    streakData.lastWeek = weekNum;
+    localStorage.setItem('streakData', JSON.stringify(streakData));
+
+    document.getElementById('streakNum').textContent = streakData.streak;
+    document.getElementById('totalAssessments').textContent =
+        totalAssessments;
+
+    // ── Last Assessed Date ───────────────────────────────
+    const lastDate = localStorage.getItem('lastAssessedDate');
+    if (lastDate) {
+        const d = new Date(lastDate);
+        document.getElementById('lastAssessedDate').textContent =
+            'Last: ' + d.toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            });
+    }
+    localStorage.setItem('lastAssessedDate', now.toISOString());
+
+    // ── Weekly Reminder ──────────────────────────────────
+    const lastAssessed = localStorage.getItem('lastAssessedDate');
+    if (lastAssessed) {
+        const daysSince = Math.floor(
+            (now - new Date(lastAssessed)) / (1000 * 60 * 60 * 24)
+        );
+        if (daysSince >= 7) {
+            document.getElementById('reminderBanner').style.display = 'flex';
+            document.getElementById('reminderText').textContent =
+                `It has been ${daysSince} days since your last assessment. Time to check in!`;
+        }
+    }
+
+    // ── Badges ───────────────────────────────────────────
+    const goalData = JSON.parse(
+        localStorage.getItem('goalData') || '{"days":0}'
+    );
+
+    const earned = new Set(
+        JSON.parse(localStorage.getItem('earnedBadges') || '[]')
+    );
+
+    // Check badge conditions
+    if (totalAssessments >= 1)  earned.add('first');
+    if (totalAssessments >= 5)  earned.add('dedicated');
+    if (totalAssessments >= 10) earned.add('champion');
+    if (streakData.streak >= 3) earned.add('streak3');
+    if (goalData.days >= 7)     earned.add('goalmaster');
+    if (riskImproved)           earned.add('improver');
+
+    localStorage.setItem('earnedBadges', JSON.stringify([...earned]));
+
+    const badgeGrid = document.getElementById('badgeGrid');
+    badgeGrid.innerHTML = BADGES.map(badge => {
+        const isEarned = earned.has(badge.id);
+        return `
+        <div class="badge-item ${isEarned ? 'earned' : 'locked'}"
+             title="${isEarned ? '✅ Earned!' : '🔒 ' + badge.desc}">
+            <div class="badge-emoji">${badge.emoji}</div>
+            <div class="badge-name">${badge.name}</div>
+            <div class="badge-desc">${badge.desc}</div>
+            ${isEarned ? '<div style="font-size:11px; color:#059669; font-weight:700; margin-top:4px;">✅ Earned</div>' : ''}
+        </div>`;
+    }).join('');
+
+    // ── Restore Goal State ───────────────────────────────
+    const savedGoal = localStorage.getItem('activeGoal');
+    if (savedGoal) {
+        restoreGoal(savedGoal, goalData.days);
+    }
+}
+
+// ── Goal Functions ───────────────────────────────────────
+function selectGoal(goalId) {
+    document.querySelectorAll('.goal-option').forEach(o =>
+        o.classList.remove('active'));
+    document.querySelector(
+        `.goal-option input[value="${goalId}"]`
+    ).closest('.goal-option').classList.add('active');
+    document.querySelector(
+        `.goal-option input[value="${goalId}"]`
+    ).checked = true;
+
+    localStorage.setItem('activeGoal', goalId);
+    localStorage.setItem('goalData', JSON.stringify({ days: 0 }));
+    restoreGoal(goalId, 0);
+}
+
+function restoreGoal(goalId, days) {
+    document.getElementById('goalSelector').style.display = 'none';
+    document.getElementById('goalProgress').style.display = 'block';
+    document.getElementById('goalTitle').textContent =
+        GOAL_NAMES[goalId] || goalId;
+    updateGoalProgress(days);
+
+    const radio = document.querySelector(
+        `.goal-option input[value="${goalId}"]`
+    );
+    if (radio) radio.checked = true;
+}
+
+function updateGoalProgress(days) {
+    document.getElementById('goalDays').textContent = days;
+    const pct = Math.min((days / 30) * 100, 100);
+    document.getElementById('goalFill').style.width = pct + '%';
+
+    let msg = '';
+    if (days === 0) msg = 'Start logging your progress daily!';
+    else if (days < 7)  msg = `Great start! ${7 - days} more days to earn the Goal Master badge.`;
+    else if (days < 30) msg = `Excellent! ${30 - days} days left to complete your goal. 🔥`;
+    else msg = '🎉 Goal Complete! You have maintained this habit for 30 days!';
+    document.getElementById('goalMessage').textContent = msg;
+}
+
+function logGoalDay() {
+    const goalData = JSON.parse(
+        localStorage.getItem('goalData') || '{"days":0}'
+    );
+    const lastLogged = localStorage.getItem('lastGoalLog');
+    const today = new Date().toDateString();
+
+    if (lastLogged === today) {
+        document.getElementById('goalMessage').textContent =
+            '✅ Already logged today! Come back tomorrow.';
+        document.getElementById('goalMessage').style.color = '#F59E0B';
+        return;
+    }
+
+    goalData.days += 1;
+    localStorage.setItem('goalData', JSON.stringify(goalData));
+    localStorage.setItem('lastGoalLog', today);
+    updateGoalProgress(goalData.days);
+
+    document.getElementById('goalMessage').style.color = '#059669';
+
+    // Check badge
+    if (goalData.days >= 7) {
+        const earned = new Set(
+            JSON.parse(localStorage.getItem('earnedBadges') || '[]')
+        );
+        if (!earned.has('goalmaster')) {
+            earned.add('goalmaster');
+            localStorage.setItem('earnedBadges',
+                JSON.stringify([...earned]));
+            setTimeout(() => {
+                alert('🎯 Badge Unlocked: Goal Master! You logged 7 days on your health goal!');
+                location.reload();
+            }, 500);
+        }
+    }
+}
+
+function resetGoal() {
+    localStorage.removeItem('activeGoal');
+    localStorage.removeItem('goalData');
+    localStorage.removeItem('lastGoalLog');
+    document.getElementById('goalSelector').style.display = 'block';
+    document.getElementById('goalProgress').style.display = 'none';
+}
 </script>
 
 </body>
