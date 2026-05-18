@@ -8,13 +8,47 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { font-family: 'Inter', sans-serif; }
+
         body {
             background: linear-gradient(135deg, #0F2044 0%, #1a56db 100%);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Navbar ── */
+        nav {
+            background: linear-gradient(90deg, #0F2044, #1a3a6e);
+            padding: 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            gap: 12px;
+        }
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+            letter-spacing: 0.3px;
+            flex-shrink: 0;
+        }
+
+        /* ── Center Wrapper ── */
+        .page-center {
+            flex: 1;
+            display: flex;
             align-items: center;
             justify-content: center;
+            padding: 40px 16px;
         }
+
+        /* ── Auth Card ── */
         .auth-card {
             background: white;
             border-radius: 20px;
@@ -120,145 +154,44 @@
     </style>
 </head>
 <body>
+
 <!-- ── Navbar ── -->
-<nav style="background:linear-gradient(90deg,#0F2044,#1a3a6e);
-padding:0; box-shadow:0 2px 12px rgba(0,0,0,0.2);
-position:sticky; top:0; z-index:999;">
+<nav>
     <div class="container">
-        <div style="display:flex; align-items:center;
-        justify-content:space-between; padding:12px 0; gap:12px;">
-
-            <!-- Brand -->
-            <a href="home.html"
-            style="font-size:20px; font-weight:800; color:white;
-            text-decoration:none; letter-spacing:0.3px; flex-shrink:0;">
-                ❤️ CardioPredict AI
-            </a>
-
-            <!-- Module Links (hidden on mobile, shown on desktop) -->
-            <div class="d-none d-md-flex align-items-center"
-            style="gap:4px;">
-                <a href="index.html" id="nav-risk"
-                style="color:rgba(255,255,255,0.8); text-decoration:none;
-                padding:7px 14px; border-radius:20px; font-size:14px;
-                font-weight:500; transition:all 0.2s;"
-                onmouseover="this.style.background='rgba(255,255,255,0.12)';
-                this.style.color='white'"
-                onmouseout="this.style.background='transparent';
-                this.style.color='rgba(255,255,255,0.8)'">
-                    📊 Risk Assessment
-                </a>
-                <a href="triage.html" id="nav-triage"
-                style="color:rgba(255,255,255,0.8); text-decoration:none;
-                padding:7px 14px; border-radius:20px; font-size:14px;
-                font-weight:500; transition:all 0.2s;"
-                onmouseover="this.style.background='rgba(255,255,255,0.12)';
-                this.style.color='white'"
-                onmouseout="this.style.background='transparent';
-                this.style.color='rgba(255,255,255,0.8)'">
-                    🩺 Symptoms
-                </a>
-                <a href="recommendations.html" id="nav-rec"
-                style="color:rgba(255,255,255,0.8); text-decoration:none;
-                padding:7px 14px; border-radius:20px; font-size:14px;
-                font-weight:500; transition:all 0.2s;"
-                onmouseover="this.style.background='rgba(255,255,255,0.12)';
-                this.style.color='white'"
-                onmouseout="this.style.background='transparent';
-                this.style.color='rgba(255,255,255,0.8)'">
-                    💊 Health Advice
-                </a>
-            </div>
-
-            <!-- Auth -->
-            <div style="display:flex; align-items:center; gap:8px;
-            flex-shrink:0;">
-                <!-- Guest -->
-                <div id="guestNav" class="d-flex gap-2">
-                    <a href="login.html"
-                    style="color:white; font-size:13px;
-                    text-decoration:none;
-                    border:1.5px solid rgba(255,255,255,0.4);
-                    padding:6px 14px; border-radius:20px;
-                    transition:all 0.2s;"
-                    onmouseover="this.style.background='rgba(255,255,255,0.1)'"
-                    onmouseout="this.style.background='transparent'">
-                        Log In
-                    </a>
-                    <a href="login.html"
-                    style="color:#0F2044; font-size:13px;
-                    text-decoration:none; background:white;
-                    padding:6px 14px; border-radius:20px;
-                    font-weight:600; transition:all 0.2s;"
-                    onmouseover="this.style.background='#E0E7FF'"
-                    onmouseout="this.style.background='white'">
-                        Sign Up
-                    </a>
-                </div>
-                <!-- User -->
-                <div id="userNav" style="display:none;
-                align-items:center; gap:8px;">
-                    <span id="navUsername"
-                    style="color:white; font-size:13px;
-                    font-weight:500;"></span>
-                    <button onclick="handleLogout()"
-                    style="color:white; font-size:12px;
-                    background:rgba(255,255,255,0.12);
-                    border:none; padding:6px 14px;
-                    border-radius:20px; cursor:pointer;
-                    transition:all 0.2s;"
-                    onmouseover="this.style.background='rgba(255,255,255,0.22)'"
-                    onmouseout="this.style.background='rgba(255,255,255,0.12)'">
-                        Logout
-                    </button>
-                </div>
-
-                <!-- Mobile Menu Button -->
-                <button class="d-md-none"
-                onclick="toggleMobileMenu()"
-                style="background:rgba(255,255,255,0.12);
-                border:none; color:white; padding:6px 12px;
-                border-radius:8px; font-size:18px; cursor:pointer;">
-                    ☰
-                </button>
-            </div>
+        <div class="nav-inner">
+            <a href="home.html" class="navbar-brand">❤️ CardioPredict AI</a>
+            
+            <button class="d-md-none"
+            onclick="toggleMobileMenu()"
+            style="background:rgba(255,255,255,0.12); border:none;
+            color:white; padding:6px 12px; border-radius:8px;
+            font-size:18px; cursor:pointer;">☰</button>
         </div>
-
-        <!-- Mobile Dropdown Menu -->
+        <!-- Mobile Menu -->
         <div id="mobileMenu" style="display:none;
-        border-top:1px solid rgba(255,255,255,0.1);
-        padding:12px 0;">
-            <a href="index.html"
-            style="display:block; color:rgba(255,255,255,0.85);
-            text-decoration:none; padding:10px 4px; font-size:15px;
-            font-weight:500;">
-                📊 Risk Assessment
-            </a>
-            <a href="triage.html"
-            style="display:block; color:rgba(255,255,255,0.85);
-            text-decoration:none; padding:10px 4px; font-size:15px;
-            font-weight:500;">
-                🩺 Symptom Checker
-            </a>
-            <a href="recommendations.html"
-            style="display:block; color:rgba(255,255,255,0.85);
-            text-decoration:none; padding:10px 4px; font-size:15px;
-            font-weight:500;">
-                💊 Health Advice
-            </a>
+        border-top:1px solid rgba(255,255,255,0.1); padding:12px 0;">
+            <a href="index.html" style="display:block; color:rgba(255,255,255,0.85);
+            text-decoration:none; padding:10px 4px; font-size:15px;">
+                📊 Risk Assessment</a>
+            <a href="triage.html" style="display:block; color:rgba(255,255,255,0.85);
+            text-decoration:none; padding:10px 4px; font-size:15px;">
+                🩺 Symptom Checker</a>
+            <a href="recommendations.html" style="display:block; color:rgba(255,255,255,0.85);
+            text-decoration:none; padding:10px 4px; font-size:15px;">
+                💊 Health Advice</a>
         </div>
     </div>
 </nav>
 
+<!-- ── Centered Auth Card ── -->
+<div class="page-center">
     <div class="auth-card">
 
-        <!-- Brand -->
         <div class="brand">
             <h1>❤️ CardioPredict AI</h1>
             <p>Sign in to your account</p>
         </div>
 
-        <!-- Alert Box -->
         <div class="alert-box" id="alertBox"></div>
 
         <!-- Login Form -->
@@ -273,9 +206,7 @@ position:sticky; top:0; z-index:999;">
                 <input type="password" class="form-control" id="loginPassword"
                        placeholder="Enter your password">
             </div>
-            <button class="btn-login" onclick="handleLogin()">
-                Sign In
-            </button>
+            <button class="btn-login" onclick="handleLogin()">Sign In</button>
             <div class="divider">or</div>
             <button class="btn-register" onclick="showRegister()">
                 Create New Account
@@ -308,14 +239,15 @@ position:sticky; top:0; z-index:999;">
             </button>
         </div>
 
-        <!-- Back to Home -->
-        <p style="text-align:center; margin-top:20px; font-size:13px; color:#94A3B8;">
-            <a href="index.html" style="color:#1a56db; text-decoration:none;">
+        <p style="text-align:center; margin-top:20px;
+        font-size:13px; color:#94A3B8;">
+            <a href="home.html" style="color:#1a56db; text-decoration:none;">
                 ← Back to Home
             </a>
         </p>
 
     </div>
+</div>
 
 <script>
     function showAlert(message, type) {
@@ -338,7 +270,7 @@ position:sticky; top:0; z-index:999;">
     }
 
     async function handleLogin() {
-        const email = document.getElementById('loginEmail').value;
+        const email    = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
 
         if (!email || !password) {
@@ -352,34 +284,28 @@ position:sticky; top:0; z-index:999;">
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
-
             const result = await response.json();
-
             if (response.ok) {
-                // Save user info to localStorage
                 localStorage.setItem('user', JSON.stringify(result.user));
                 showAlert('Login successful! Redirecting...', 'success');
-                setTimeout(() => {
-                    window.location.href = 'home.html';
-                }, 1000);
+                setTimeout(() => { window.location.href = 'home.html'; }, 1000);
             } else {
                 showAlert(result.error || 'Login failed', 'error');
             }
         } catch (error) {
-    showAlert('Invalid email or password. Please try again.', 'error');
-}
+            showAlert('Invalid email or password. Please try again.', 'error');
+        }
     }
 
     async function handleRegister() {
         const full_name = document.getElementById('regName').value;
-        const email = document.getElementById('regEmail').value;
-        const password = document.getElementById('regPassword').value;
+        const email     = document.getElementById('regEmail').value;
+        const password  = document.getElementById('regPassword').value;
 
         if (!full_name || !email || !password) {
             showAlert('Please fill in all fields', 'error');
             return;
         }
-
         if (password.length < 6) {
             showAlert('Password must be at least 6 characters', 'error');
             return;
@@ -391,9 +317,7 @@ position:sticky; top:0; z-index:999;">
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ full_name, email, password })
             });
-
             const result = await response.json();
-
             if (response.ok) {
                 showAlert('Account created! Please sign in.', 'success');
                 setTimeout(() => showLogin(), 1500);
@@ -401,74 +325,33 @@ position:sticky; top:0; z-index:999;">
                 showAlert(result.error || 'Registration failed', 'error');
             }
         } catch (error) {
-    showAlert('Registration failed. Please try again.', 'error');
-}
-    }
-
-    // Check if already logged in
-    const user = localStorage.getItem('user');
-    if (user) {
-    window.location.href = 'home.html';
-}
-
-// ── Navbar Auth ──────────────────────────────────────────
-function checkAuth() {
-    const user = localStorage.getItem('user');
-    if (user) {
-        const u = JSON.parse(user);
-        document.getElementById('guestNav').style.display = 'none';
-        document.getElementById('userNav').style.display = 'flex';
-        document.getElementById('navUsername').textContent =
-            '👤 ' + u.name;
-    } else {
-        document.getElementById('guestNav').style.display = 'flex';
-        document.getElementById('userNav').style.display = 'none';
-    }
-}
-
-// ── Highlight Active Page ────────────────────────────────
-function highlightActivePage() {
-    const page = window.location.pathname.split('/').pop();
-    const map = {
-        'index.html':           'nav-risk',
-        'triage.html':          'nav-triage',
-        'recommendations.html': 'nav-rec',
-    };
-    const activeId = map[page];
-    if (activeId) {
-        const el = document.getElementById(activeId);
-        if (el) {
-            el.style.background = 'rgba(255,255,255,0.18)';
-            el.style.color = 'white';
-            el.style.fontWeight = '700';
+            showAlert('Registration failed. Please try again.', 'error');
         }
     }
-}
 
-// ── Mobile Menu ──────────────────────────────────────────
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobileMenu');
-    menu.style.display =
-        menu.style.display === 'none' ? 'block' : 'none';
-}
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.style.display =
+            menu.style.display === 'none' ? 'block' : 'none';
+    }
 
-// ── Logout ───────────────────────────────────────────────
-async function handleLogout() {
-    try {
-        await fetch('http://127.0.0.1:5000/api/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-    } catch(e) {}
-    localStorage.removeItem('user');
-    localStorage.removeItem('lastPrediction');
-    localStorage.removeItem('userBasicInfo');
-    window.location.href = 'login.html';
-}
+    async function handleLogout() {
+        try {
+            await fetch('http://127.0.0.1:5000/api/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch(e) {}
+        localStorage.removeItem('user');
+        localStorage.removeItem('lastPrediction');
+        localStorage.removeItem('userBasicInfo');
+        window.location.href = 'login.html';
+    }
 
-checkAuth();
-highlightActivePage();
+    // Redirect if already logged in
+    const user = localStorage.getItem('user');
+    if (user) { window.location.href = 'home.html'; }
+
 </script>
-
 </body>
 </html>
