@@ -45,52 +45,29 @@ core modules into a single cardiovascular health management platform:
 
 ## 📁 Project Structure
 cardiopredict-ai/
-
 ├── data/                    # Dataset files and generated charts
-
 │   ├── cardio_train.csv     # Original Kaggle dataset (70,000 records)
-
 │   ├── cardio_cleaned.csv   # Cleaned dataset (68,517 records)
-
 │   └── *.png                # Generated visualization charts
-
 ├── notebooks/               # Jupyter notebooks
-
 │   ├── 01_data_exploration.ipynb
-
 │   ├── 02_feature_engineering.ipynb
-
 │   └── 03_visualizations.ipynb
-
 ├── backend/
-
 │   ├── app.py               # Flask application with all API routes
-
 │   ├── models.py            # SQLAlchemy database models
-
 │   └── models/              # Saved ML model files
-
 │       ├── xgb_model.pkl    # Trained XGBoost model
-
 │       ├── scaler.pkl       # Fitted StandardScaler
-
 │       └── feature_names.json
 ├── frontend/
-
 │   ├── home.html            # Landing page
-
 │   ├── index.html           # Risk Assessment (Module 1)
-
 │   ├── triage.html          # Symptom Checker (Module 2)
-
 │   ├── recommendations.html # Health Advice + Goals (Module 3)
-
 │   └── login.html           # Login and Registration
-
 ├── database/                # SQLite database (excluded from git)
-
 ├── requirements.txt         # Python dependencies
-
 └── README.md
 
 ---
